@@ -14,6 +14,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema PoliPases
 -- -----------------------------------------------------
+drop database if exists Polipases;
 CREATE SCHEMA IF NOT EXISTS `PoliPases` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
 USE `PoliPases` ;
 
@@ -21,10 +22,10 @@ USE `PoliPases` ;
 -- Table `PoliPases`.`Equipo`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PoliPases`.`Equipo` (
-  `id` INT NOT NULL,
-  `nombre` VARCHAR(45) NOT NULL,
+  `idEquipo` INT NOT NULL,
+  `nombreEquipo` VARCHAR(45) NOT NULL,
   `posicion_id` VARCHAR(45) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`idEquipo`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -34,9 +35,9 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `PoliPases`.`Posicion`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PoliPases`.`Posicion` (
-  `idPosicion` INT NOT NULL AUTO_INCREMENT,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `rol` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`idPosicion`))
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -47,17 +48,17 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PoliPases`.`Equipo_has_Posicion` (
   `Equipo_id` INT NOT NULL,
-  `Posicion_idPosicion` INT NOT NULL,
+  `idPosicion` INT NOT NULL,
   `cantidadPermitida` INT NULL DEFAULT NULL,
-  PRIMARY KEY (`Equipo_id`, `Posicion_idPosicion`),
-  INDEX `fk_Equipo_has_Posicion_Posicion1_idx` (`Posicion_idPosicion` ASC) VISIBLE,
+  PRIMARY KEY (`Equipo_id`, `idPosicion`),
+  INDEX `fk_Equipo_has_Posicion_Posicion1_idx` (`idPosicion` ASC) VISIBLE,
   INDEX `fk_Equipo_has_Posicion_Equipo1_idx` (`Equipo_id` ASC) VISIBLE,
   CONSTRAINT `fk_Equipo_has_Posicion_Equipo1`
     FOREIGN KEY (`Equipo_id`)
-    REFERENCES `PoliPases`.`Equipo` (`id`),
+    REFERENCES `PoliPases`.`Equipo` (`idEquipo`),
   CONSTRAINT `fk_Equipo_has_Posicion_Posicion1`
-    FOREIGN KEY (`Posicion_idPosicion`)
-    REFERENCES `PoliPases`.`Posicion` (`idPosicion`))
+    FOREIGN KEY (`idPosicion`)
+    REFERENCES `PoliPases`.`Posicion` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -75,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `PoliPases`.`Fichaje` (
   INDEX `fk_Fichaje_Equipo1_idx` (`Equipo_id` ASC) VISIBLE,
   CONSTRAINT `fk_Fichaje_Equipo1`
     FOREIGN KEY (`Equipo_id`)
-    REFERENCES `PoliPases`.`Equipo` (`id`))
+    REFERENCES `PoliPases`.`Equipo` (`idEquipo`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -85,11 +86,11 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `PoliPases`.`Representante`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PoliPases`.`Representante` (
-  `DNI` INT NOT NULL,
-  `nombre` VARCHAR(45) NULL DEFAULT NULL,
-  `apellido` VARCHAR(45) NULL DEFAULT NULL,
+  `dniRepresentante` INT NOT NULL,
+  `nombreRepresentante` VARCHAR(45) NULL DEFAULT NULL,
+  `apellidoRepresentante` VARCHAR(45) NULL DEFAULT NULL,
   `fechaNacimiento` DATE NULL DEFAULT NULL,
-  PRIMARY KEY (`DNI`))
+  PRIMARY KEY (`dniRepresentante`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -100,8 +101,8 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PoliPases`.`Jugador` (
   `DNI` INT NOT NULL,
-  `nombre` VARCHAR(45) NULL DEFAULT NULL,
-  `apellido` VARCHAR(45) NULL DEFAULT NULL,
+  `nombreJugador` VARCHAR(45) NULL DEFAULT NULL,
+  `apellidoJugador` VARCHAR(45) NULL DEFAULT NULL,
   `fechaNacimiento` DATE NULL DEFAULT NULL,
   `salario` DECIMAL(10,2) NULL DEFAULT NULL,
   `Representante_DNI` INT NULL DEFAULT NULL,
@@ -116,10 +117,10 @@ CREATE TABLE IF NOT EXISTS `PoliPases`.`Jugador` (
     REFERENCES `PoliPases`.`Fichaje` (`idFichaje`),
   CONSTRAINT `fk_Jugador_Posicion1`
     FOREIGN KEY (`Posicion_idPosicion`)
-    REFERENCES `PoliPases`.`Posicion` (`idPosicion`),
+    REFERENCES `PoliPases`.`Posicion` (`id`),
   CONSTRAINT `Jugador_ibfk_1`
     FOREIGN KEY (`Representante_DNI`)
-    REFERENCES `PoliPases`.`Representante` (`DNI`))
+    REFERENCES `PoliPases`.`Representante` (`dniRepresentante`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -130,17 +131,17 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PoliPases`.`Representante_has_Equipo` (
   `Representante_DNI` INT NOT NULL,
-  `Equipo_id` INT NOT NULL,
+  `Equipo_idEquipo` INT NOT NULL,
   `Representante_habilitado` TINYINT NULL DEFAULT NULL,
-  PRIMARY KEY (`Representante_DNI`, `Equipo_id`),
-  INDEX `fk_Representante_has_Equipo_Equipo1_idx` (`Equipo_id` ASC) VISIBLE,
+  PRIMARY KEY (`Representante_DNI`, `Equipo_idEquipo`),
+  INDEX `fk_Representante_has_Equipo_Equipo1_idx` (`Equipo_idEquipo` ASC) VISIBLE,
   INDEX `fk_Representante_has_Equipo_Representante1_idx` (`Representante_DNI` ASC) VISIBLE,
   CONSTRAINT `fk_Representante_has_Equipo_Equipo1`
-    FOREIGN KEY (`Equipo_id`)
-    REFERENCES `PoliPases`.`Equipo` (`id`),
+    FOREIGN KEY (`Equipo_idEquipo`)
+    REFERENCES `PoliPases`.`Equipo` (`idEquipo`),
   CONSTRAINT `fk_Representante_has_Equipo_Representante1`
     FOREIGN KEY (`Representante_DNI`)
-    REFERENCES `PoliPases`.`Representante` (`DNI`))
+    REFERENCES `PoliPases`.`Representante` (`dniRepresentante`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
