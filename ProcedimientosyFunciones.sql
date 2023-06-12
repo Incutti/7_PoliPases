@@ -1,12 +1,13 @@
 use Polipases;
+
 #a Procedimiento que liste los jugadores por club.
 
 drop view if exists jugadoresPorClub;
 create view jugadoresPorClub as
-select equipo.nombreEquipo, jugador.nombreJugador, jugador.apellidoJugador from jugador 
-inner join posicion on jugador.Posicion_idPosicion = posicion.id 
-inner join equipo_has_posicion on posicion.id = equipo_has_posicion.idPosicion
-inner join equipo on equipo_has_posicion.idPosicion = equipo.posicion_id;
+select Equipo.nombreEquipo, Jugador.nombreJugador, Jugador.apellidoJugador from Jugador 
+inner join Posicion on Jugador.Posicion_idPosicion = Posicion.id 
+inner join Equipo_has_Posicion on Posicion.id = Equipo_has_Posicion.idPosicion
+inner join Equipo on Equipo_has_Posicion.idPosicion = Equipo.posicion_id;
 #El group by no lo vemos necesario en este caso si quieren agreguen inserts para verificar o cambien lo que este mal
 select * from jugadoresPorClub;
 
@@ -20,16 +21,14 @@ returns INT
 DETERMINISTIC
 begin
 	DECLARE cant INT default 0;
-    select count(jugador.DNI) into cant from jugador 
-    inner join posicion on jugador.Posicion_idPosicion = posicion.id 
-	inner join equipo_has_posicion on posicion.id = equipo_has_posicion.idPosicion
-	inner join equipo on equipo_has_posicion.idPosicion = equipo.posicion_id 
-    where posicion.rol = posicionP and equipo.nombreEquipo = club;
+    select count(Jugador.DNI) into cant from Jugador 
+    inner join Posicion on Jugador.Posicion_idPosicion = Posicion.id 
+	inner join Equipo_has_Posicion on Posicion.id = Equipo_has_Posicion.idPosicion
+	inner join Equipo on Equipo_has_Posicion.idPosicion = Equipo.posicion_id 
+    where Posicion.rol = posicionP and Equipo.nombreEquipo = club;
     return cant;
 end//
-
 delimiter ;
-
 select cantJugadoresPorPosicion("DFC","River") as cant;
 
 #c.Función que dado un manager y un club retorne la cantidad de jugadores que representa.
@@ -38,16 +37,16 @@ select cantJugadoresPorPosicion("DFC","River") as cant;
 delimiter // 
 
 drop function if exists jugadoresManagerClub//
-create function jugadoresManagerClub(manager varchar(45), club varchar(45))
+create function jugadoresManagerClub(idManager int, club varchar(45))
 returns INT
 DETERMINISTIC
 begin
 	DECLARE cant INT default 0;
-    select count(jugador.DNI) into cant from jugador
-    inner join representante on jugador.Representante_DNI = representante.dniRepresentante 
-	inner join representante_has_equipo on representante.dniRepresentante = representante_has_equipo.Representante_DNI
-	inner join equipo on representante_has_equipo.Representante_DNI = equipo.posicion_id
-    where representante.nombreRepresentante = manager and equipo.nombreEquipo = club;
+    select count(jugador.DNI) into cant from Jugador
+    inner join Representante on Jugador.Representante_DNI = Representante.dniRepresentante 
+	inner join Representante_has_Equipo on Representante.dniRepresentante = Representante_has_Equipo.Representante_DNI
+	inner join Equipo on Representante_has_Equipo.Representante_DNI = Equipo.posicion_id
+    where Representante.dniRepresentante = idManager and Equipo.nombreEquipo = club;
     return cant;
 end//
 
@@ -70,7 +69,7 @@ begin
     DECLARE repDNI int;
     DECLARE rolId int;
     DECLARE fichajeId int;
-    #Es completamente inecesario el cursor pero bueno
+    #Es completamente innecesario el cursor pero bueno
 	DECLARE cur CURSOR FOR select DNI,
     nombreJugador, 
     apellidoJugador ,
@@ -79,7 +78,7 @@ begin
     Representante_DNI ,
     Posicion_idPosicion ,
     Fichaje_idFichaje  
-    from jugador order by salario desc;
+    from Jugador order by salario desc;
     open cur;
     fetch cur into dniI, nombre, apellido, nacimiento, salarioAlto, repDNI, rolId, fichajeId;
 	set mayorSalario = concat("DNI: ", dniI, ", Nombre: ", nombre, ", Apellido: ", apellido,
@@ -87,34 +86,74 @@ begin
     ", Id posicion: ", rolId, ", Id fichaje: ",fichajeId);
     close cur;
 end//
-
 delimiter ;
-
-#insert into jugador(DNI,nombreJugador,apellidoJugador,fechaNacimiento,salario,Representante_DNI,Posicion_idPosicion,Fichaje_idFichaje)
-#values (1,"Juan","Domingues",'2005-10-5',5000.50,2,3,4);
+-- insert into Jugador(DNI,nombreJugador,apellidoJugador,fechaNacimiento,salario,Representante_DNI,Posicion_idPosicion,Fichaje_idFichaje)
+-- values (1,"Juan","Domingues",'2005-10-5',5000.50,2,3,4);
 call salarioMayor(@mayorSalario);
 select @mayorSalario;
 
 #e.Función que, dada una posición, devuelva el nombre del club con más jugadores de esa posición.
 
 delimiter //
-
 drop function if exists clubMasJugadores//
-create function clubMasJugadores(posicionId varchar(45))
+create function clubMasJugadores(posicionId int)
 returns varchar(100)
 deterministic
 begin
 	declare club varchar(100);
-	select nombreEquipo, count(*) as cant from equipo group by nombreEquipo order by cant desc limit 1 into club; 
+	select nombreEquipo, count(*) as cant from Equipo join Equipo_has_Posicion on Equipo_id=idEquipo where idPosicion=posicionId  group by nombreEquipo order by cant desc limit 1 into club ; 
 	return club;
 end//
-
 delimiter ;
-#Esto no funciona
-select clubMasJugadores(2) as clubMasDFC;
+select clubMasJugadores(3) as nombreclub;
+#Esto no funciona / update / solo tira un error de q el select tiene cantidad diferentes de columnas
+/* select clubMasJugadores(2) as clubMasDFC;
 #pero esto creo que si
 select nombreEquipo, count(*) as cant from equipo group by nombreEquipo order by cant desc limit 1;
 #No encontramos el problema
-
+*/
 #f.Procedimiento que, dado un fichaje, lo revise y solucione.
+#la idea es crear 3 procedimientos uno q verifique si el manager tienen hablitado el equipo, otro que se fije si el jugador tiene un numero de camiseta que ya esta en el equipo y otro que verifique si la posicion del jugador no exede el maximo de posiciones en el equipo.
+# cree un procedimiento que verifique si el manager tiene habilitado el equipo al cual el jugador tiene que ser fichado 
+
+delimiter //
+create function verificarManager (idDeFichaje int)
+returns boolean 
+deterministic
+begin 
+	declare verificacion boolean default false;
+	declare idEquipoFichaje int;
+    select Equipo_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje;
+    if (select Representante_habilitado from Representante_has_Equipo where Equipo_idEquipo=idEquipoFichaje)
+		then 
+        set verificacion = true;
+	end if;
+    return verificacion;
+end //
+delimiter ;
+
+create function verificarPosicion (idDeFichaje int)
+returns boolean 
+deterministic
+begin 
+	declare verificacion boolean default true;
+	declare idPosicionFichaje int;
+    declare idposicionJugador int;
+    declare idJugador int;
+    declare cantidadDePos int;
+    declare idEquipoFichaje int;
+	select Equipo_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje;
+    select Jugador.Posicion_idPosicion from Jugador join Fichaje on Jugador.DNI=Jugador_DNI  where idFichaje=idDeFichaje into idPosicionFichaje;
+    select Fichaje.Jugador_DNI from Fichaje where idFichaje=idDeFichaje into idJugador;
+    select Posicion_idPosicion from Jugador where DNI= idJugador into idposicionJugador;
+    select count(*) from (select posicion_id from Equipo where idEquipo = idEquipoFichaje and posicion_id=idPosicionFichaje) into cantidadDePos;
+    if (cantidadDePos = cantidadPermitida)
+		then 
+        set verificacion = false;
+	end if;
+    return verificacion;
+end //
+delimiter ;
+
+
 
