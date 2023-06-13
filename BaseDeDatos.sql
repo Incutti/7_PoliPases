@@ -70,11 +70,16 @@ CREATE TABLE IF NOT EXISTS `PoliPases`.`Fichaje` (
   `numCamiseta` VARCHAR(45) NULL DEFAULT NULL,
   `fechaHoraFichaje` DATETIME NULL DEFAULT NULL,
   `Equipo_id` INT NOT NULL,
+  `Jugador_id` INT NOT NULL,
   PRIMARY KEY (`idFichaje`),
   INDEX `fk_Fichaje_Equipo1_idx` (`Equipo_id` ASC) VISIBLE,
+  INDEX `fk_Fichaje_Jugador1_idx` (`Jugador_id` ASC) VISIBLE,
   CONSTRAINT `fk_Fichaje_Equipo1`
     FOREIGN KEY (`Equipo_id`)
-    REFERENCES `PoliPases`.`Equipo` (`idEquipo`))
+    REFERENCES `PoliPases`.`Equipo` (`idEquipo`),
+  CONSTRAINT `fk_Fichaje_Jugador1`
+	FOREIGN KEY (`Jugador_id`)
+    REFERENCES `PoliPases`.`Jugador` (`DNI`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
@@ -105,14 +110,9 @@ CREATE TABLE IF NOT EXISTS `PoliPases`.`Jugador` (
   `salario` DECIMAL(10,2) NULL DEFAULT NULL,
   `Representante_DNI` INT NULL DEFAULT NULL,
   `Posicion_idPosicion` INT NOT NULL,
-  `Fichaje_idFichaje` INT NOT NULL,
   PRIMARY KEY (`DNI`),
   INDEX `Representante_DNI` (`Representante_DNI` ASC) VISIBLE,
   INDEX `fk_Jugador_Posicion1_idx` (`Posicion_idPosicion` ASC) VISIBLE,
-  INDEX `fk_Jugador_Fichaje1_idx` (`Fichaje_idFichaje` ASC) VISIBLE,
-  CONSTRAINT `fk_Jugador_Fichaje1`
-    FOREIGN KEY (`Fichaje_idFichaje`)
-    REFERENCES `PoliPases`.`Fichaje` (`idFichaje`),
   CONSTRAINT `fk_Jugador_Posicion1`
     FOREIGN KEY (`Posicion_idPosicion`)
     REFERENCES `PoliPases`.`Posicion` (`id`),

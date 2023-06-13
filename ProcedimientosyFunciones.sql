@@ -2,7 +2,7 @@ use PoliPases;
 /*
 INSERT INTO `PoliPases`.`Equipo` (`idEquipo`, `nombreEquipo`) VALUES
 (1, 'Equipo A'),
-(2, 'Equipo b'),
+(2, 'Equipo B'),
 (3, 'Equipo C');
 INSERT INTO `PoliPases`.`Posicion` (`id`, `rol`) VALUES
 (1, 'Delantero'),
@@ -14,17 +14,17 @@ INSERT INTO `PoliPases`.`Equipo_has_Posicion` (`Equipo_id`, `idPosicion`, `canti
 (2, 1, 2),
 (2, 3, 3),
 (3, 2, 5);
-INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje`, `Equipo_id`) VALUES
-(1, '10', '2023-06-01 10:00:00', 1),
-(2, '7', '2023-06-02 15:30:00', 2),
-(3, '5', '2023-06-03 12:45:00', 3);
+INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje`, `Equipo_id`, `Jugador_id`) VALUES
+(1, '10', '2023-06-01 10:00:00', 1,11111111),
+(2, '7', '2023-06-02 15:30:00', 2,22222222),
+(3, '5', '2023-06-03 12:45:00', 3,33333333);
 INSERT INTO `PoliPases`.`Representante` (`dniRepresentante`, `nombreRepresentante`, `apellidoRepresentante`, `fechaNacimiento`) VALUES
 (12345678, 'Juan', 'Pérez', '1990-05-15'),
 (87654321, 'María', 'Gómez', '1985-12-10');
-INSERT INTO `PoliPases`.`Jugador` (`DNI`, `nombreJugador`, `apellidoJugador`, `fechaNacimiento`, `salario`, `Representante_DNI`, `Posicion_idPosicion`, `Fichaje_idFichaje`) VALUES
-(11111111, 'Jugador A', 'Apellido A', '1995-08-20', 5000.00, 12345678, 1, 1),
-(22222222, 'Jugador B', 'Apellido B', '1998-02-10', 4000.00, 87654321, 2, 2),
-(33333333, 'Jugador C', 'Apellido C', '1993-11-05', 6000.00, 12345678, 3, 3);
+INSERT INTO `PoliPases`.`Jugador` (`DNI`, `nombreJugador`, `apellidoJugador`, `fechaNacimiento`, `salario`, `Representante_DNI`, `Posicion_idPosicion`) VALUES
+(11111111, 'Jugador A', 'Apellido A', '1995-08-20', 5000.00, 12345678, 1),
+(22222222, 'Jugador B', 'Apellido B', '1998-02-10', 4000.00, 87654321, 2),
+(33333333, 'Jugador C', 'Apellido C', '1993-11-05', 6000.00, 12345678, 3);
 INSERT INTO `PoliPases`.`Representante_has_Equipo` (`Representante_DNI`, `Equipo_idEquipo`, `Representante_habilitado`) VALUES
 (12345678, 1, 1),
 (87654321, 2, 1),
@@ -36,10 +36,10 @@ INSERT INTO `PoliPases`.`Representante_has_Equipo` (`Representante_DNI`, `Equipo
 drop view if exists jugadoresPorClub;
 create view jugadoresPorClub as
 select Equipo.nombreEquipo, Jugador.nombreJugador, Jugador.apellidoJugador from Jugador 
-left join Fichaje on Jugador.Fichaje_idFichaje = Fichaje.idFichaje
-left join Equipo on Fichaje.Equipo_id = Equipo.idEquipo;
+join Fichaje on Jugador.DNI = Fichaje.Jugador_id
+join Equipo on Fichaje.Equipo_id = Equipo.idEquipo;
 select * from jugadoresPorClub;
-
+select * from Equipo;
 #b Función que, dada una posición y un club, retorne la cantidad de jugadores convocados para esa posición.
 
 delimiter // 
