@@ -14,7 +14,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema PoliPases
 -- -----------------------------------------------------
-drop database if exists Polipases;
+drop database if exists PoliPases;
 CREATE SCHEMA IF NOT EXISTS `PoliPases` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci ;
 USE `PoliPases` ;
 -- -----------------------------------------------------
@@ -23,7 +23,6 @@ USE `PoliPases` ;
 CREATE TABLE IF NOT EXISTS `PoliPases`.`Equipo` (
   `idEquipo` INT NOT NULL,
   `nombreEquipo` VARCHAR(45) NOT NULL,
-  `posicion_id` VARCHAR(45) NULL DEFAULT NULL,
   PRIMARY KEY (`idEquipo`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
