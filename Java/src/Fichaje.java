@@ -14,6 +14,14 @@ public class Fichaje {
         this.completado = completado;
     }
 
+    public Fichaje(){
+        numeroCamiseta= 3;
+        fechaHoraFichaje=LocalDateTime.now();
+        jugador=new Jugador();
+        club=new Equipo();
+        completado=false;
+    }
+
     public int getNumeroCamiseta() {
         return numeroCamiseta;
     }

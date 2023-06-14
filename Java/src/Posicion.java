@@ -4,6 +4,7 @@ public class Posicion {
     public Posicion(String rol) {
         this.rol = rol;
     }
+    public Posicion(){rol = "delantero";}
 
     public String getRol() {
         return rol;

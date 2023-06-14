@@ -5,6 +5,12 @@ public class Jugador extends Persona{
     private Representante representante;
     private Posicion posicion;
 
+    public Jugador(){
+        super();
+        double salario=0;
+        representante=new Representante();
+        posicion=new Posicion();
+    }
     public Jugador(int dni, String nombre, String apellido, LocalDate fechaNacimiento, double salario, Representante representante, Posicion posicion) {
         super(dni, nombre, apellido, fechaNacimiento);
         this.salario = salario;

@@ -12,6 +12,12 @@ public class Persona {
         this.apellido = apellido;
         this.fechaNacimiento = fechaNacimiento;
     }
+    public Persona(){
+        dni=233712;
+        nombre="pepe";
+        apellido="Perez";
+        fechaNacimiento= LocalDate.now();
+    }
 
     public int getDni() {
         return dni;

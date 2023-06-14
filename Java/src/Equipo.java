@@ -10,7 +10,11 @@ public class Equipo {
         this.cantPermitidaPosicion = cantPermitidaPosicion;
         this.dorsales = dorsales;
     }
-
+    public Equipo(){
+        nombre="nombre1";
+        cantPermitidaPosicion=new HashMap<>();
+        dorsales=new HashMap<>();
+    }
     public String getNombre() {
         return nombre;
     }
