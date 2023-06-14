@@ -138,6 +138,7 @@ select clubMasJugadores(3) as clubMasJugadores;
 # cree un procedimiento que verifique si el manager tiene habilitado el equipo al cual el jugador tiene que ser fichado 
 
 delimiter //
+drop function if exists verificarManager//
 create function verificarManager (idDeFichaje int)
 returns boolean 
 deterministic

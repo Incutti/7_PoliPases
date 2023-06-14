@@ -57,19 +57,23 @@ public class Sistema {
     } // hicimos esto pero despues de que lo hagamos explicó q teniamos q llamar a las tblas desde sql asi q no creo q sirva.
     // PD: como explico la conexion al final de la clase no llegamos a hacer nada mas que descargar el .jar
     public Jugador jugadorMasJovenFichado(Equipo equipo){
-
+        Jugador jugador = new Jugador();
+        return jugador;
     }
 
     public Fichaje fichajeCaidoPorPosicion(Equipo equipo, Posicion posicion){
-
+        Fichaje fichaje = new Fichaje();
+        return fichaje;
     }
 
     public HashMap<Posicion, Jugador> mejorPagoPorPosicion(){
-
+        HashMap<Posicion, Jugador>hash = new HashMap<>();
+        return hash;
     }
 
     public Equipo clubProhibidoMasRecurrente(){
-
+        Equipo equipo = new Equipo();
+        return equipo;
     }
 
     public void correccionFichaje(){
@@ -77,6 +81,7 @@ public class Sistema {
     }
 
     public HashSet<Representante> managerRepetido(){
-        
+        HashSet<Representante>representantes = new HashSet<>();
+        return representantes;
     }
 }
