@@ -3,12 +3,12 @@ import java.util.HashMap;
 public class Equipo {
     private String nombre;
     private HashMap<Posicion,Integer> cantPermitidaPosicion;
-    private HashMap<Integer, Jugador>Dorsales;
+    private HashMap<Integer, Jugador>dorsales;
 
     public Equipo(String nombre, HashMap<Posicion, Integer> cantPermitidaPosicion, HashMap<Integer, Jugador> dorsales) {
         this.nombre = nombre;
         this.cantPermitidaPosicion = cantPermitidaPosicion;
-        Dorsales = dorsales;
+        this.dorsales = dorsales;
     }
 
     public String getNombre() {
@@ -28,11 +28,11 @@ public class Equipo {
     }
 
     public HashMap<Integer, Jugador> getDorsales() {
-        return Dorsales;
+        return dorsales;
     }
 
     public void setDorsales(HashMap<Integer, Jugador> dorsales) {
-        Dorsales = dorsales;
+        this.dorsales = dorsales;
     }
 
     public void jugadoresMalRepresentados(){
