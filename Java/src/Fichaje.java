@@ -5,12 +5,13 @@ public class Fichaje {
     private LocalDateTime fechaHoraFichaje;
     private Jugador jugador;
     private Equipo club;
-
-    public Fichaje(int numeroCamiseta, LocalDateTime fechaHoraFichaje, Jugador jugador, Equipo club) {
+    private boolean completado;
+    public Fichaje(int numeroCamiseta, LocalDateTime fechaHoraFichaje, Jugador jugador, Equipo club, boolean completado) {
         this.numeroCamiseta = numeroCamiseta;
         this.fechaHoraFichaje = fechaHoraFichaje;
         this.jugador = jugador;
         this.club = club;
+        this.completado = completado;
     }
 
     public int getNumeroCamiseta() {
@@ -43,5 +44,13 @@ public class Fichaje {
 
     public void setClub(Equipo club) {
         this.club = club;
+    }
+
+    public boolean isCompletado() {
+        return completado;
+    }
+
+    public void setCompletado(boolean completado) {
+        this.completado = completado;
     }
 }
