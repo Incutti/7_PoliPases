@@ -1,256 +1,226 @@
--- MySQL dump 10.13  Distrib 8.0.33, for Linux (x86_64)
---
--- Host: 127.0.0.1    Database: PoliPases
--- ------------------------------------------------------
--- Server version	8.0.33-0ubuntu0.22.04.2
+use PoliPases;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+INSERT INTO `PoliPases`.`Equipo` (`idEquipo`, `nombreEquipo`) VALUES
+(1, 'Equipo A'),
+(2, 'Equipo B'),
+(3, 'Equipo C');
+INSERT INTO `PoliPases`.`Posicion` (`id`, `rol`) VALUES
+(1, 'Delantero'),
+(2, 'Centrocampista'),
+(3, 'Defensa');
+INSERT INTO `PoliPases`.`Equipo_has_Posicion` (`Equipo_id`, `idPosicion`, `cantidadPermitida`) VALUES
+(1, 1, 3),
+(1, 2, 4),
+(2, 1, 2),
+(2, 3, 3),
+(3, 2, 5);
+INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje`, `Equipo_id`, `Jugador_id`) VALUES
+(1, '10', '2023-06-01 10:00:00', 1,11111111),
+(2, '7', '2023-06-02 15:30:00', 2,22222222),
+(3, '5', '2023-06-03 12:45:00', 3,33333333);
+INSERT INTO `PoliPases`.`Representante` (`dniRepresentante`, `nombreRepresentante`, `apellidoRepresentante`, `fechaNacimiento`) VALUES
+(12345678, 'Juan', 'Pérez', '1990-05-15'),
+(87654321, 'María', 'Gómez', '1985-12-10');
+INSERT INTO `PoliPases`.`Jugador` (`DNI`, `nombreJugador`, `apellidoJugador`, `fechaNacimiento`, `salario`, `Representante_DNI`, `Posicion_idPosicion`) VALUES
+(11111111, 'Jugador A', 'Apellido A', '1995-08-20', 5000.00, 12345678, 1),
+(22222222, 'Jugador B', 'Apellido B', '1998-02-10', 4000.00, 87654321, 2),
+(33333333, 'Jugador C', 'Apellido C', '1993-11-05', 6000.00, 12345678, 3);
+insert into Jugador values (11111112, 'Jugador D', 'Apelldo D',  '1998-02-10', 4000.00, 87654321, 1);
+INSERT INTO `PoliPases`.`Representante_has_Equipo` (`Representante_DNI`, `Equipo_idEquipo`, `Representante_habilitado`) VALUES
+(12345678, 1, 1),
+(87654321, 2, 1),
+(12345678, 3, 0);
 
---
--- Table structure for table `Equipo`
---
+SELECT * FROM jugadoresPorClub;
 
-DROP TABLE IF EXISTS `Equipo`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Equipo` (
-  `idEquipo` int NOT NULL,
-  `nombreEquipo` varchar(45) NOT NULL,
-  PRIMARY KEY (`idEquipo`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+#a Procedimiento que liste los jugadores por club.
 
---
--- Dumping data for table `Equipo`
---
+drop view if exists jugadoresPorClub;
+create view jugadoresPorClub as
+select Equipo.nombreEquipo, Jugador.nombreJugador, Jugador.apellidoJugador, Posicion.rol from Jugador 
+join Fichaje on Jugador.DNI = Fichaje.Jugador_id
+join Equipo on Fichaje.Equipo_id = Equipo.idEquipo 
+join Posicion on Posicion_idPosicion=Posicion.id;
+select * from jugadoresPorClub;
+select * from Equipo;
+#b Función que, dada una posición y un club, retorne la cantidad de jugadores convocados para esa posición.
 
-LOCK TABLES `Equipo` WRITE;
-/*!40000 ALTER TABLE `Equipo` DISABLE KEYS */;
-INSERT INTO `Equipo` VALUES (1,'Equipo A'),(2,'Equipo B'),(3,'Equipo C');
-/*!40000 ALTER TABLE `Equipo` ENABLE KEYS */;
-UNLOCK TABLES;
+delimiter // 
 
---
--- Table structure for table `Equipo_has_Posicion`
---
+drop function if exists cantJugadoresPorPosicion//
+create function cantJugadoresPorPosicion(posicionP int, idclub int)
+returns INT
+DETERMINISTIC
+begin
+	DECLARE cant INT default 0;
+    select count(Jugador.DNI) into cant from Jugador 
+    left join Posicion on Jugador.Posicion_idPosicion = Posicion.id 
+	left join Equipo_has_Posicion on Posicion.id = Equipo_has_Posicion.idPosicion
+    where Jugador.Posicion_idPosicion = posicionP and Equipo_has_Posicion.Equipo_id = idclub;
+    return cant;
+end//
+delimiter ;
+select cantJugadoresPorPosicion(1,1) as cantJugadoresPorPosicion;
+#c.Función que dado un manager y un club retorne la cantidad de jugadores que representa.
 
-DROP TABLE IF EXISTS `Equipo_has_Posicion`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Equipo_has_Posicion` (
-  `Equipo_id` int NOT NULL,
-  `idPosicion` int NOT NULL,
-  `cantidadPermitida` int DEFAULT NULL,
-  PRIMARY KEY (`Equipo_id`,`idPosicion`),
-  KEY `fk_Equipo_has_Posicion_Posicion1_idx` (`idPosicion`),
-  KEY `fk_Equipo_has_Posicion_Equipo1_idx` (`Equipo_id`),
-  CONSTRAINT `fk_Equipo_has_Posicion_Equipo1` FOREIGN KEY (`Equipo_id`) REFERENCES `Equipo` (`idEquipo`),
-  CONSTRAINT `fk_Equipo_has_Posicion_Posicion1` FOREIGN KEY (`idPosicion`) REFERENCES `Posicion` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `Equipo_has_Posicion`
---
+delimiter // 
 
-LOCK TABLES `Equipo_has_Posicion` WRITE;
-/*!40000 ALTER TABLE `Equipo_has_Posicion` DISABLE KEYS */;
-INSERT INTO `Equipo_has_Posicion` VALUES (1,1,3),(1,2,4),(2,1,2),(2,3,3),(3,2,5);
-/*!40000 ALTER TABLE `Equipo_has_Posicion` ENABLE KEYS */;
-UNLOCK TABLES;
+drop function if exists jugadoresManagerClub//
+create function jugadoresManagerClub(idManager int, club int)
+returns INT
+DETERMINISTIC
+begin
+	DECLARE cant INT default 0;
+    select count(Jugador.DNI) into cant from Jugador
+    left join Representante on Jugador.Representante_DNI = Representante.dniRepresentante 
+	left join Representante_has_Equipo on Representante.dniRepresentante = Representante_has_Equipo.Representante_DNI
+    where Representante.dniRepresentante = idManager and Representante_has_Equipo.Equipo_idEquipo = club;
+    return cant;
+end//
 
---
--- Table structure for table `Fichaje`
---
+delimiter ;
 
-DROP TABLE IF EXISTS `Fichaje`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Fichaje` (
-  `idFichaje` int NOT NULL AUTO_INCREMENT,
-  `numCamiseta` varchar(45) DEFAULT NULL,
-  `fechaHoraFichaje` datetime DEFAULT NULL,
-  `Equipo_id` int NOT NULL,
-  `Jugador_id` int NOT NULL,
-  PRIMARY KEY (`idFichaje`),
-  KEY `fk_Fichaje_Equipo1_idx` (`Equipo_id`),
-  KEY `fk_Fichaje_Jugador1_idx` (`Jugador_id`),
-  CONSTRAINT `fk_Fichaje_Equipo1` FOREIGN KEY (`Equipo_id`) REFERENCES `Equipo` (`idEquipo`),
-  CONSTRAINT `fk_Fichaje_Jugador1` FOREIGN KEY (`Jugador_id`) REFERENCES `Jugador` (`DNI`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+select jugadoresManagerClub(12345678,1) as jugadoresManagerClub;
 
---
--- Dumping data for table `Fichaje`
---
+#d. Procedimiento que retorne en parámetros de salida los datos del jugador mejor pago.
 
-LOCK TABLES `Fichaje` WRITE;
-/*!40000 ALTER TABLE `Fichaje` DISABLE KEYS */;
-INSERT INTO `Fichaje` VALUES (1,'10','2023-06-01 10:00:00',1,11111111),(2,'7','2023-06-02 15:30:00',2,22222222),(3,'5','2023-06-03 12:45:00',3,33333333);
-/*!40000 ALTER TABLE `Fichaje` ENABLE KEYS */;
-UNLOCK TABLES;
+delimiter //
 
---
--- Table structure for table `Jugador`
---
+drop procedure if exists salarioMayor//
+create procedure salarioMayor(OUT mayorSalario varchar(1000))
+begin
+	DECLARE dniI int;
+    DECLARE nombre varchar(45);
+    DECLARE apellido varchar(45);
+    DECLARE nacimiento date;
+    DECLARE salarioAlto DECIMAL(10,2);
+    DECLARE repDNI int;
+    DECLARE rolId int;
+    DECLARE fichajeId int;
+	select DNI,
+    nombreJugador, 
+    apellidoJugador ,
+    fechaNacimiento ,
+    salario ,
+    Representante_DNI ,
+    Posicion_idPosicion ,
+    Fichaje_idFichaje  
+    from Jugador order by salario desc limit 1
+    into dniI, nombre, apellido, nacimiento, salarioAlto, repDNI, rolId, fichajeId;
+	set mayorSalario = concat("DNI: ", dniI, ", Nombre: ", nombre, ", Apellido: ", apellido,
+    ", Nacimiento: ", nacimiento, ", Salario: ",  salarioAlto, ", Dni Representante:", repDNI,
+    ", Id posicion: ", rolId, ", Id fichaje: ",fichajeId);
+end//
+delimiter ;
+call salarioMayor(@mayorSalario);
+select @mayorSalario;
 
-DROP TABLE IF EXISTS `Jugador`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Jugador` (
-  `DNI` int NOT NULL,
-  `nombreJugador` varchar(45) DEFAULT NULL,
-  `apellidoJugador` varchar(45) DEFAULT NULL,
-  `fechaNacimiento` date DEFAULT NULL,
-  `salario` decimal(10,2) DEFAULT NULL,
-  `Representante_DNI` int DEFAULT NULL,
-  `Posicion_idPosicion` int NOT NULL,
-  PRIMARY KEY (`DNI`),
-  KEY `Representante_DNI` (`Representante_DNI`),
-  KEY `fk_Jugador_Posicion1_idx` (`Posicion_idPosicion`),
-  CONSTRAINT `fk_Jugador_Posicion1` FOREIGN KEY (`Posicion_idPosicion`) REFERENCES `Posicion` (`id`),
-  CONSTRAINT `Jugador_ibfk_1` FOREIGN KEY (`Representante_DNI`) REFERENCES `Representante` (`dniRepresentante`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+#e.Función que, dada una posición, devuelva el nombre del club con más jugadores de esa posición.
 
---
--- Dumping data for table `Jugador`
---
+delimiter //
+drop function if exists clubMasJugadores//
+create function clubMasJugadores(posicionId int)
+returns varchar(100)
+deterministic
+begin
+	declare club varchar(100);
+	select Equipo.nombreEquipo into club from Equipo
+    inner join Equipo_has_Posicion on Equipo_has_Posicion.Equipo_id=Equipo.idEquipo 
+    inner join Posicion on Equipo_has_Posicion.idPosicion=Posicion.id
+    inner join Jugador on Posicion.id = Jugador.Posicion_idPosicion
+    where Jugador.Posicion_idPosicion=posicionId  group by Equipo.nombreEquipo 
+    order by count(Jugador.DNI) desc limit 1; 
+	return club;
+end//
+delimiter ;
+select clubMasJugadores(3) as clubMasJugadores;
 
-LOCK TABLES `Jugador` WRITE;
-/*!40000 ALTER TABLE `Jugador` DISABLE KEYS */;
-INSERT INTO `Jugador` VALUES (11111111,'Jugador A','Apellido A','1995-08-20',5000.00,12345678,1),(11111112,'Jugador D','Apelldo D','1998-02-10',4000.00,87654321,1),(22222222,'Jugador B','Apellido B','1998-02-10',4000.00,87654321,2),(33333333,'Jugador C','Apellido C','1993-11-05',6000.00,12345678,3);
-/*!40000 ALTER TABLE `Jugador` ENABLE KEYS */;
-UNLOCK TABLES;
+#f.Procedimiento que, dado un fichaje, lo revise y solucione.
+#la idea es crear 3 funciones uno q verifique si el manager tienen hablitado el equipo, otro que se fije si el jugador tiene un numero de camiseta que ya esta en el equipo y otro que verifique si la posicion del jugador no excede el maximo de posiciones en el equipo.
+# cree un procedimiento que verifique si el manager tiene habilitado el equipo al cual el jugador tiene que ser fichado 
 
---
--- Table structure for table `Posicion`
---
+delimiter //
+drop function if exists verificarManager//
+create function verificarManager (idDeFichaje int)
+returns boolean 
+deterministic
+begin 
+	declare verificacion boolean default false;
+	declare idEquipoFichaje int;
+    select Equipo_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje;
+    if (select Representante_habilitado from Representante_has_Equipo where Equipo_idEquipo=idEquipoFichaje)
+		then 
+        set verificacion = true;
+	end if;
+    return verificacion;
+end //
+delimiter ;
 
-DROP TABLE IF EXISTS `Posicion`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Posicion` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `rol` varchar(45) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+delimiter //
+create function verificarPosicion (idDeFichaje int)
+returns boolean 
+deterministic
+begin 
+	declare verificacion boolean default true;
+	declare idPosicionFichaje int;
+    declare idposicionJugador int;
+    declare idJugador int;
+    declare cantidadDePos int;
+    declare idEquipoFichaje int;
+	select Equipo_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje;
+    select Jugador.Posicion_idPosicion from Jugador join Fichaje on Jugador.DNI=Jugador_DNI  where idFichaje=idDeFichaje into idPosicionFichaje;
+    select Fichaje.Jugador_DNI from Fichaje where idFichaje=idDeFichaje into idJugador;
+    select Posicion_idPosicion from Jugador where DNI= idJugador into idposicionJugador;
+    select count(*) from (select posicion_id from Equipo where idEquipo = idEquipoFichaje and posicion_id=idPosicionFichaje) into cantidadDePos;
+    if (cantidadDePos = cantidadPermitida)
+		then 
+        set verificacion = false;
+	end if;
+    return verificacion;
+end //
+delimiter ;
 
---
--- Dumping data for table `Posicion`
---
+-- para java 
 
-LOCK TABLES `Posicion` WRITE;
-/*!40000 ALTER TABLE `Posicion` DISABLE KEYS */;
-INSERT INTO `Posicion` VALUES (1,'Delantero'),(2,'Centrocampista'),(3,'Defensa');
-/*!40000 ALTER TABLE `Posicion` ENABLE KEYS */;
-UNLOCK TABLES;
+/*
 
---
--- Table structure for table `Representante`
---
+esto es del c
 
-DROP TABLE IF EXISTS `Representante`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Representante` (
-  `dniRepresentante` int NOT NULL,
-  `nombreRepresentante` varchar(45) DEFAULT NULL,
-  `apellidoRepresentante` varchar(45) DEFAULT NULL,
-  `fechaNacimiento` date DEFAULT NULL,
-  PRIMARY KEY (`dniRepresentante`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
+delimiter //
+drop function if exists jugadoresManagerClub//
+create function jugadoresManagerClub(club int)
+returns INT
+DETERMINISTIC
+begin
+	DECLARE cant INT default 0;
+    DECLARE dnirep INT default 0;
+    select dniRepresentante, count(Jugador.DNI) into dnirep, cant from Jugador
+    left join Representante on Jugador.Representante_DNI = Representante.dniRepresentante 
+	left join Representante_has_Equipo on Representante.dniRepresentante = Representante_has_Equipo.Representante_DNI
+    where Representante_has_Equipo.Equipo_idEquipo = club 
+    group by dniRepresentante;
+    return cant;
+end//
+delimiter ;
+select jugadoresManagerClub(1) as jugadoresManagerClub;
 
---
--- Dumping data for table `Representante`
---
+esto es del d
 
-LOCK TABLES `Representante` WRITE;
-/*!40000 ALTER TABLE `Representante` DISABLE KEYS */;
-INSERT INTO `Representante` VALUES (12345678,'Juan','Pérez','1990-05-15'),(87654321,'María','Gómez','1985-12-10');
-/*!40000 ALTER TABLE `Representante` ENABLE KEYS */;
-UNLOCK TABLES;
+DECLARE dniI int;
+    DECLARE nombre varchar(45);
+    DECLARE apellido varchar(45);
+    DECLARE nacimiento date;
+    DECLARE salarioAlto DECIMAL(10,2);
+    DECLARE repDNI int;
+    DECLARE rolId int;
+    DECLARE fichajeId int;
+	select Posicion_idPosicion ,DNI,nombreJugador, apellidoJugador,fechaNacimiento,salario,Representante_DNI,idFichaje  
+    from Jugador join Fichaje on DNI=Jugador_id group by Posicion_idPosicion ,DNI,nombreJugador, apellidoJugador,fechaNacimiento,salario,Representante_DNI,idFichaje 
+    order by salario desc limit 1
+    into rolId, dniI, nombre, apellido, nacimiento, salarioAlto, repDNI, fichajeId;
+	set mayorSalario = concat("Id posicion: ", rolId, ", DNI: ", dniI, ", Nombre: ", nombre, ", Apellido: ", apellido,
+    ", Nacimiento: ", nacimiento, ", Salario: ",  salarioAlto, ", Dni Representante:", repDNI,
+    ", Id posicion: ", rolId, ", Id fichaje: ",fichajeId);
+*/
 
---
--- Table structure for table `Representante_has_Equipo`
---
-
-DROP TABLE IF EXISTS `Representante_has_Equipo`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Representante_has_Equipo` (
-  `Representante_DNI` int NOT NULL,
-  `Equipo_idEquipo` int NOT NULL,
-  `Representante_habilitado` tinyint DEFAULT NULL,
-  PRIMARY KEY (`Representante_DNI`,`Equipo_idEquipo`),
-  KEY `fk_Representante_has_Equipo_Equipo1_idx` (`Equipo_idEquipo`),
-  KEY `fk_Representante_has_Equipo_Representante1_idx` (`Representante_DNI`),
-  CONSTRAINT `fk_Representante_has_Equipo_Equipo1` FOREIGN KEY (`Equipo_idEquipo`) REFERENCES `Equipo` (`idEquipo`),
-  CONSTRAINT `fk_Representante_has_Equipo_Representante1` FOREIGN KEY (`Representante_DNI`) REFERENCES `Representante` (`dniRepresentante`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `Representante_has_Equipo`
---
-
-LOCK TABLES `Representante_has_Equipo` WRITE;
-/*!40000 ALTER TABLE `Representante_has_Equipo` DISABLE KEYS */;
-INSERT INTO `Representante_has_Equipo` VALUES (12345678,1,1),(12345678,3,0),(87654321,2,1);
-/*!40000 ALTER TABLE `Representante_has_Equipo` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Temporary view structure for view `jugadoresPorClub`
---
-
-DROP TABLE IF EXISTS `jugadoresPorClub`;
-/*!50001 DROP VIEW IF EXISTS `jugadoresPorClub`*/;
-SET @saved_cs_client     = @@character_set_client;
-/*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `jugadoresPorClub` AS SELECT 
- 1 AS `nombreEquipo`,
- 1 AS `nombreJugador`,
- 1 AS `apellidoJugador`,
- 1 AS `rol`*/;
-SET character_set_client = @saved_cs_client;
-
---
--- Final view structure for view `jugadoresPorClub`
---
-
-/*!50001 DROP VIEW IF EXISTS `jugadoresPorClub`*/;
-/*!50001 SET @saved_cs_client          = @@character_set_client */;
-/*!50001 SET @saved_cs_results         = @@character_set_results */;
-/*!50001 SET @saved_col_connection     = @@collation_connection */;
-/*!50001 SET character_set_client      = utf8mb4 */;
-/*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
-/*!50001 CREATE ALGORITHM=UNDEFINED */
-/*!50013 DEFINER=`alumno`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `jugadoresPorClub` AS select `Equipo`.`nombreEquipo` AS `nombreEquipo`,`Jugador`.`nombreJugador` AS `nombreJugador`,`Jugador`.`apellidoJugador` AS `apellidoJugador`,`Posicion`.`rol` AS `rol` from (((`Jugador` join `Fichaje` on((`Jugador`.`DNI` = `Fichaje`.`Jugador_id`))) join `Equipo` on((`Fichaje`.`Equipo_id` = `Equipo`.`idEquipo`))) join `Posicion` on((`Jugador`.`Posicion_idPosicion` = `Posicion`.`id`))) */;
-/*!50001 SET character_set_client      = @saved_cs_client */;
-/*!50001 SET character_set_results     = @saved_cs_results */;
-/*!50001 SET collation_connection      = @saved_col_connection */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2023-06-16 17:50:32
