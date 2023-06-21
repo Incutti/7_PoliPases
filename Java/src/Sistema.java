@@ -1,3 +1,4 @@
+import javax.lang.model.util.SimpleAnnotationValueVisitor6;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,6 +11,8 @@ public class Sistema {
     private HashSet<Equipo>listaEquipos;
     private HashSet<Representante>listaManager;
     private AccesoBaseDeDatos accesoBase;
+
+    private List<String>tablas;
 
     public Sistema(HashSet<Fichaje> historiaFichaje, HashSet<Equipo> listaEquipos, HashSet<Representante> listaManager) {
         this.historiaFichaje = historiaFichaje;
@@ -47,19 +50,35 @@ public class Sistema {
         this.listaManager = listaManager;
     }
 
+    public AccesoBaseDeDatos getAccesoBase() {
+        return accesoBase;
+    }
+
+    public void setAccesoBase(AccesoBaseDeDatos accesoBase) {
+        this.accesoBase = accesoBase;
+    }
+
     public void jugadoresPorClubPorPosicion() {
-        String consulta = "SHOW COLUMNS FROM jugadoresPorClub";
+        String consulta = "SELECT * FROM jugadoresPorClub;";
         ArrayList<String> nombreCampos = new ArrayList<>();
         try {
             ResultSet data;
-            PreparedStatement sentenciaSQL = DriverManager.getConnection("jdbc:mysql://localhost:3306/PoliPases", "alumno", "alumnoipm").prepareStatement(consulta);
+            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
             data = sentenciaSQL.executeQuery(consulta);
             while (data.next() == true) {
-                nombreCampos.add(data.getString("Field"));
+                nombreCampos.add(data.getString("nombreJugador"));
+                nombreCampos.add(data.getString("apellidoJugador"));// ESTA LINEA me muestra lo q hay en el campo entre comillas
+                nombreCampos.add(data.getString("nombreEquipo"));
+                nombreCampos.add(data.getString("rol"));
+                nombreCampos.add("\n");
+
             }
 
         } catch (SQLException ex) {
             ex.printStackTrace();
+        }
+        for(String campo:nombreCampos){
+            System.out.println(campo);
         }
         // return nombreCampos;
     }
@@ -93,15 +112,17 @@ public class Sistema {
         return representantes;
     }
     public static void main(String[] args) {
-        List<String> tablas = Arrays.asList("Jugador", "Posicion", "Fichaje", "Equipo", "Representante", "Representante_has_Equipo", "Equipo_has_Posicion");
+        Sistema s1= new Sistema();
 
-        AccesoBaseDeDatos bdd = new AccesoBaseDeDatos("PoliPases", tablas);
+        s1.tablas = Arrays.asList("Jugador", "Posicion", "Fichaje", "Equipo", "Representante", "Representante_has_Equipo", "Equipo_has_Posicion");
+        s1.accesoBase = new AccesoBaseDeDatos("PoliPases", s1.tablas);
+
         try {
-            bdd.conectar("alumno", "alumnoipm");
+            s1.accesoBase.conectar("alumno", "alumnoipm");
+            s1.jugadoresPorClubPorPosicion();
 
         } catch (SQLException ex) {
             System.out.println(ex);
         }
     }
 }
-// preguntar si podemos agregar lo de la linea 96 y 98 como atributos de la clase.

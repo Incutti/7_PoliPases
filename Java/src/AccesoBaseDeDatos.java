@@ -15,7 +15,31 @@ public class AccesoBaseDeDatos {
         this.nombreTabla = nombreTabla;
     }
 
-     public void conectar(String user, String password) throws SQLException {
+    public Connection getConexion() {
+        return conexion;
+    }
+
+    public void setConexion(Connection conexion) {
+        this.conexion = conexion;
+    }
+
+    public String getNombreBaseDeDatos() {
+        return nombreBaseDeDatos;
+    }
+
+    public void setNombreBaseDeDatos(String nombreBaseDeDatos) {
+        this.nombreBaseDeDatos = nombreBaseDeDatos;
+    }
+
+    public List<String> getNombreTabla() {
+        return nombreTabla;
+    }
+
+    public void setNombreTabla(List<String> nombreTabla) {
+        this.nombreTabla = nombreTabla;
+    }
+
+    public void conectar(String user, String password) throws SQLException {
         String url = "jdbc:mysql://localhost:3306/"+nombreBaseDeDatos;
         try {
             conexion = DriverManager.getConnection(url, user, password);
