@@ -80,12 +80,28 @@ public class Sistema {
         for(String campo:nombreCampos){
             System.out.println(campo);
         }
-        // return nombreCampos;
     }
 
-    public Jugador jugadorMasJovenFichado(Equipo equipo){
-        Jugador jugador = new Jugador();
-        return jugador;
+    public void jugadorMasJovenFichado(){
+        String consulta = "SELECT fechaNacimiento, DNI, apellidoJugador, nombreEquipo FROM Jugador JOIN Fichaje ON DNI=Jugador_id JOIN Equipo ON Equipo_id=idEquipo WHERE fechaNacimiento= (SELECT min(fechaNacimiento)FROM Jugador);";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+            while (data.next() == true) {
+                nombreCampos.add(data.getString("fechaNacimiento"));
+                nombreCampos.add(data.getString("DNI"));
+                nombreCampos.add(data.getString("apellidoJugador"));// ESTA LINEA me muestra lo q hay en el campo entre comillas
+                nombreCampos.add(data.getString("nombreEquipo"));
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        for(String campo:nombreCampos){
+            System.out.println(campo);
+        }
     }
 
     public Fichaje fichajeCaidoPorPosicion(Equipo equipo, Posicion posicion){
@@ -120,7 +136,7 @@ public class Sistema {
         try {
             s1.accesoBase.conectar("alumno", "alumnoipm");
             s1.jugadoresPorClubPorPosicion();
-
+            s1.jugadorMasJovenFichado();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
