@@ -164,16 +164,16 @@ deterministic
 begin 
 	declare verificacion boolean default true;
 	declare idPosicionFichaje int;
-    declare idposicionJugador int;
     declare idJugador int;
     declare cantidadDePos int;
     declare idEquipoFichaje int;
-	select Equipo_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje;
-    select Jugador.Posicion_idPosicion from Jugador join Fichaje on Jugador.DNI=Jugador_DNI  where idFichaje=idDeFichaje into idPosicionFichaje;
-    select Fichaje.Jugador_DNI from Fichaje where idFichaje=idDeFichaje into idJugador;
-    select Posicion_idPosicion from Jugador where DNI= idJugador into idposicionJugador;
-    select count(*) from (select posicion_id from Equipo where idEquipo = idEquipoFichaje and posicion_id=idPosicionFichaje) into cantidadDePos;
-    if (cantidadDePos = cantidadPermitida)
+	select Equipo_id, Jugador_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje, idJugador;
+    select Posicion_idPosicion into idPosicionFichaje from Jugador where DNI = idJugador;
+    select count(Jugador.DNI) from Equipo join Equipo_has_Posicion on Equipo.idEquipo = Equipo_has_Posicion.Equipo_id
+    join Posicion on Equipo_has_Posicion.idPosicion = Posicion.id
+    join Jugador on Posicion.id = Jugador.Posicion_idPosicion
+    where Equipo.idEquipo = idEquipoFichaje and Posicion.id = idPosicionFichaje into cantidadDePos;
+    if (cantidadDePos > (select cantidadPermitda from Equipo_has_Posicion where Equipo_id = idEquipoFichaje and idPosicion = idPosicionFichaje) )
 		then 
         set verificacion = false;
 	end if;
@@ -181,6 +181,35 @@ begin
 end //
 delimiter ;
 
+delimiter //
+create function verificarCamiseta (idDeFichaje int)
+returns boolean 
+deterministic
+begin 
+	declare done INT default 0;
+	declare verificacion boolean default true;
+    declare idEquipoFichaje int;
+    declare numCamisetaFichaje int;
+    declare numCamisaCur int;
+    declare cur cursor for select numCamiseta from Fichaje where Equipo_id = idEquipoFichaje;
+    declare continue handler for not found set done = 1;
+    open cur;
+    select Equipo_id into idEquipoFichaje from Fichaje where idFichaje = idDeFichaje;
+    select numCamiseta from Fichaje where idFichaje = idDeFichaje into numCamisetaFichaje;
+    recorrer : LOOP
+		fetch cur into numCamisaCur;
+		if  numCamisetaFichaje = numCamisaCur then 
+			leave recorrer;
+			set verificacion = false;
+		end if;
+        if done = 1 then
+			leave recorrer;
+		end if;
+	end LOOP;
+    close cur;
+    return verificacion;
+end //
+delimiter ;
 -- para java 
 
 /*
