@@ -180,9 +180,28 @@ public class Sistema {
         return hash;
     }
 
-    public Equipo clubProhibidoMasRecurrente(){
-        Equipo equipo = new Equipo();
-        return equipo;
+    public void clubProhibidoMasRecurrente(){
+        String consulta = "select max(cantidad), Equipo_idEquipo from (select Equipo_idEquipo, count(*) as cantidad from Representante_has_Equipo where Representante_habilitado=0 group by Equipo_idEquipo) as cualquiercosa group by Equipo_idEquipo limit 1;";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+
+            while (data.next()) {
+                nombreCampos.add(data.getString("max(cantidad)"));
+                nombreCampos.add(data.getString("Equipo_idEquipo"));
+                nombreCampos.add("\n");
+
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        for(String campo:nombreCampos){
+            System.out.println(campo);
+        }
+
     }
 
     public void correccionFichaje(){
@@ -206,6 +225,7 @@ public class Sistema {
             s1.fichajeCaidoPorPosicion();
             s1.jugadorMalRepresentado();
             s1.managerRepetidoEnClub();
+            s1.clubProhibidoMasRecurrente();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
