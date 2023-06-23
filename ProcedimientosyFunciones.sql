@@ -149,7 +149,7 @@ begin
 	declare verificacion boolean default false;
 	declare idEquipoFichaje int;
     select Equipo_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje;
-    if (select Representante_habilitado from Representante_has_Equipo where Equipo_idEquipo=idEquipoFichaje)
+    if (select Representante_habilitado from Representante_has_Equipo where Equipo_idEquipo=idEquipoFichaje) = 1
 		then 
         set verificacion = true;
 	end if;
@@ -173,7 +173,7 @@ begin
     join Posicion on Equipo_has_Posicion.idPosicion = Posicion.id
     join Jugador on Posicion.id = Jugador.Posicion_idPosicion
     where Equipo.idEquipo = idEquipoFichaje and Posicion.id = idPosicionFichaje into cantidadDePos;
-    if (cantidadDePos > (select cantidadPermitda from Equipo_has_Posicion where Equipo_id = idEquipoFichaje and idPosicion = idPosicionFichaje) )
+    if (cantidadDePos < (select cantidadPermitda from Equipo_has_Posicion where Equipo_id = idEquipoFichaje and idPosicion = idPosicionFichaje) )
 		then 
         set verificacion = false;
 	end if;
@@ -198,18 +198,47 @@ begin
     select numCamiseta from Fichaje where idFichaje = idDeFichaje into numCamisetaFichaje;
     recorrer : LOOP
 		fetch cur into numCamisaCur;
+        if done = 1 then
+			leave recorrer;
+		end if;
 		if  numCamisetaFichaje = numCamisaCur then 
 			leave recorrer;
 			set verificacion = false;
-		end if;
-        if done = 1 then
-			leave recorrer;
 		end if;
 	end LOOP;
     close cur;
     return verificacion;
 end //
 delimiter ;
+
+delimiter //
+
+drop procedure if exists verificarFichaje//
+create procedure verificarFichaje(IN idDeFichaje INT, errorPosicion VARCHAR(100))
+begin
+	declare numeroCamiseta int default 1;
+    declare representanteValido int;
+	if verificarManager(idDeFichaje) = false then
+    #Le asigna un representante que tenga en el equipo 
+		select Representante_DNI from Representante_has_Equipo where Representante_habilitado = true 
+        and Equipo_idEquipo in (select Equipo_id from Fichaje where idFichaje = idDeFichaje);
+	ELSEIF  verificarCamiseta(idDeFichaje) = false then
+    #Le asigna el primer numero de camiseta que este disponible empezando del 1
+		cambiarNumero : LOOP
+			update Fichaje set numCamiseta = numeroCamiseta where idFichaje = idDeFichaje;
+            if verificarCamiseta(idDeFichaje) = true then
+				leave cambiarNumero;
+			else
+				set numeroCamiseta = numeroCamiseta + 1;
+            end if;
+        end loop;
+    elseif verificarPosicion(idDeFichaje) = false then
+		set errorPosicion = "No puede haber tantos jugadores en esa posicion";
+	end if;
+end//
+
+delimiter ; 
+
 -- para java 
 
 /*
