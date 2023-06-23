@@ -65,7 +65,7 @@ public class Sistema {
             ResultSet data;
             PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
             data = sentenciaSQL.executeQuery(consulta);
-            while (data.next() == true) {
+            while (data.next()) {
                 nombreCampos.add(data.getString("nombreJugador"));
                 nombreCampos.add(data.getString("apellidoJugador"));// ESTA LINEA me muestra lo q hay en el campo entre comillas
                 nombreCampos.add(data.getString("nombreEquipo"));
@@ -89,7 +89,7 @@ public class Sistema {
             ResultSet data;
             PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
             data = sentenciaSQL.executeQuery(consulta);
-            while (data.next() == true) {
+            while (data.next()) {
                 nombreCampos.add(data.getString("fechaNacimiento"));
                 nombreCampos.add(data.getString("DNI"));
                 nombreCampos.add(data.getString("apellidoJugador"));// ESTA LINEA me muestra lo q hay en el campo entre comillas
@@ -112,10 +112,33 @@ public class Sistema {
             PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
             data = sentenciaSQL.executeQuery(consulta);
 
-            while (data.next() == true) {
+            while (data.next()) {
                 nombreCampos.add(data.getString("idFichaje"));
                 nombreCampos.add(data.getString("Equipo_id"));
                 nombreCampos.add(data.getString("Jugador_id"));
+                nombreCampos.add("\n");
+
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        for(String campo:nombreCampos){
+            System.out.println(campo);
+        }
+    }
+
+    public void jugadorMalRepresentado(){
+        String consulta = "SELECT nombreJugador, apellidoJugador FROM Jugador JOIN Fichaje on DNI=Jugador_id where !verificarManager(idFichaje);";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+
+            while (data.next()) {
+                nombreCampos.add(data.getString("nombreJugador"));
+                nombreCampos.add(data.getString("apellidoJugador"));
                 nombreCampos.add("\n");
 
             }
@@ -157,6 +180,7 @@ public class Sistema {
             s1.jugadoresPorClubPorPosicion();
             s1.jugadorMasJovenFichado();
             s1.fichajeCaidoPorPosicion();
+            s1.jugadorMalRepresentado();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
