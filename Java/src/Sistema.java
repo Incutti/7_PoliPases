@@ -129,7 +129,7 @@ public class Sistema {
     }
 
     public void jugadorMalRepresentado(){
-        String consulta = "SELECT nombreJugador, apellidoJugador FROM Jugador JOIN Fichaje on DNI=Jugador_id where !verificarManager(idFichaje);";
+        String consulta = "SELECT nombreJugador, apellidoJugador FROM Jugador JOIN Fichaje ON DNI=Jugador_id WHERE !verificarManager(idFichaje);";
         ArrayList<String> nombreCampos = new ArrayList<>();
         try {
             ResultSet data;
@@ -151,6 +151,30 @@ public class Sistema {
         }
     }
 
+    public void managerRepetidoEnClub(){
+        String consulta = "select distinct Representante_DNI, nombreRepresentante, apellidoRepresentante from Representante_has_Equipo join Representante on Representante_DNI=dniRepresentante where 2>=jugadoresManagerClub(Representante_DNI, Equipo_idEquipo);";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+
+            while (data.next()) {
+                nombreCampos.add(data.getString("Representante_DNI"));
+                nombreCampos.add(data.getString("nombreRepresentante"));
+                nombreCampos.add(data.getString("apellidoRepresentante"));
+                nombreCampos.add("\n");
+
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        for(String campo:nombreCampos){
+            System.out.println(campo);
+        }
+
+    }
     public HashMap<Posicion, Jugador> mejorPagoPorPosicion(){
         HashMap<Posicion, Jugador>hash = new HashMap<>();
         return hash;
@@ -181,6 +205,7 @@ public class Sistema {
             s1.jugadorMasJovenFichado();
             s1.fichajeCaidoPorPosicion();
             s1.jugadorMalRepresentado();
+            s1.managerRepetidoEnClub();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
