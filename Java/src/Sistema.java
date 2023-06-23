@@ -104,9 +104,28 @@ public class Sistema {
         }
     }
 
-    public Fichaje fichajeCaidoPorPosicion(Equipo equipo, Posicion posicion){
-        Fichaje fichaje = new Fichaje();
-        return fichaje;
+    public void fichajeCaidoPorPosicion(){
+        String consulta = "SELECT idFichaje, Equipo_id, Jugador_id FROM Fichaje WHERE !verificarPosicion(idFichaje);";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+
+            while (data.next() == true) {
+                nombreCampos.add(data.getString("idFichaje"));
+                nombreCampos.add(data.getString("Equipo_id"));
+                nombreCampos.add(data.getString("Jugador_id"));
+                nombreCampos.add("\n");
+
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        for(String campo:nombreCampos){
+            System.out.println(campo);
+        }
     }
 
     public HashMap<Posicion, Jugador> mejorPagoPorPosicion(){
@@ -137,6 +156,7 @@ public class Sistema {
             s1.accesoBase.conectar("alumno", "alumnoipm");
             s1.jugadoresPorClubPorPosicion();
             s1.jugadorMasJovenFichado();
+            s1.fichajeCaidoPorPosicion();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
