@@ -14,10 +14,6 @@ INSERT INTO `PoliPases`.`Equipo_has_Posicion` (`Equipo_id`, `idPosicion`, `canti
 (2, 1, 2),
 (2, 3, 3),
 (3, 2, 5);
-INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje`, `Equipo_id`, `Jugador_id`) VALUES
-(1, '10', '2023-06-01 10:00:00', 1,11111111),
-(2, '7', '2023-06-02 15:30:00', 2,22222222),
-(3, '5', '2023-06-03 12:45:00', 3,33333333);
 INSERT INTO `PoliPases`.`Representante` (`dniRepresentante`, `nombreRepresentante`, `apellidoRepresentante`, `fechaNacimiento`) VALUES
 (12345678, 'Juan', 'Pérez', '1990-05-15'),
 (87654321, 'María', 'Gómez', '1985-12-10');
@@ -30,8 +26,10 @@ INSERT INTO `PoliPases`.`Representante_has_Equipo` (`Representante_DNI`, `Equipo
 (12345678, 1, 1),
 (87654321, 2, 1),
 (12345678, 3, 0);
-
-SELECT * FROM jugadoresPorClub;
+INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje`, `Equipo_id`, `Jugador_id`) VALUES
+(1, '10', '2023-06-01 10:00:00', 1,11111111),
+(2, '7', '2023-06-02 15:30:00', 2,22222222),
+(3, '5', '2023-06-03 12:45:00', 3,33333333);
 
 #a Procedimiento que liste los jugadores por club.
 
@@ -97,20 +95,18 @@ begin
     DECLARE salarioAlto DECIMAL(10,2);
     DECLARE repDNI int;
     DECLARE rolId int;
-    DECLARE fichajeId int;
 	select DNI,
     nombreJugador, 
     apellidoJugador ,
     fechaNacimiento ,
     salario ,
     Representante_DNI ,
-    Posicion_idPosicion ,
-    Fichaje_idFichaje  
+    Posicion_idPosicion
     from Jugador order by salario desc limit 1
-    into dniI, nombre, apellido, nacimiento, salarioAlto, repDNI, rolId, fichajeId;
+    into dniI, nombre, apellido, nacimiento, salarioAlto, repDNI, rolId;
 	set mayorSalario = concat("DNI: ", dniI, ", Nombre: ", nombre, ", Apellido: ", apellido,
     ", Nacimiento: ", nacimiento, ", Salario: ",  salarioAlto, ", Dni Representante:", repDNI,
-    ", Id posicion: ", rolId, ", Id fichaje: ",fichajeId);
+    ", Id posicion: ", rolId);
 end//
 delimiter ;
 call salarioMayor(@mayorSalario);
@@ -158,6 +154,7 @@ end //
 delimiter ;
 
 delimiter //
+drop function if exists verificarPosicion//
 create function verificarPosicion (idDeFichaje int)
 returns boolean 
 deterministic
@@ -173,7 +170,7 @@ begin
     join Posicion on Equipo_has_Posicion.idPosicion = Posicion.id
     join Jugador on Posicion.id = Jugador.Posicion_idPosicion
     where Equipo.idEquipo = idEquipoFichaje and Posicion.id = idPosicionFichaje into cantidadDePos;
-    if (cantidadDePos < (select cantidadPermitda from Equipo_has_Posicion where Equipo_id = idEquipoFichaje and idPosicion = idPosicionFichaje) )
+    if (cantidadDePos < (select cantidadPermitida from Equipo_has_Posicion where Equipo_id = idEquipoFichaje and idPosicion = idPosicionFichaje) )
 		then 
         set verificacion = false;
 	end if;
@@ -182,6 +179,7 @@ end //
 delimiter ;
 
 delimiter //
+drop function if exists verificarCamiseta//
 create function verificarCamiseta (idDeFichaje int)
 returns boolean 
 deterministic
@@ -281,4 +279,7 @@ DECLARE dniI int;
     ", Nacimiento: ", nacimiento, ", Salario: ",  salarioAlto, ", Dni Representante:", repDNI,
     ", Id posicion: ", rolId, ", Id fichaje: ",fichajeId);
 */
-
+delimiter ;
+select distinct rol,max(salario),nombreJugador,apellidoJugador,fechaNacimiento,Representante_DNI from Jugador 
+join Posicion on Jugador.Posicion_idPosicion = Posicion.id 
+group by rol,nombreJugador,apellidoJugador,fechaNacimiento,Representante_DNI;
