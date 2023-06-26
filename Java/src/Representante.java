@@ -13,10 +13,10 @@ public class Representante extends Persona{
         this.jugadoresRepresentados = jugadoresRepresentados;
     }
 
-    public  Representante (){
-        clubesContactados=new HashSet<>();
-        clubesContactados=new HashSet<>();
-        jugadoresRepresentados=new HashSet<>();
+    public  Representante () {
+        
+        clubesContactados = new HashSet<>();
+        jugadoresRepresentados = new HashSet<>();
     }
     public HashSet<Equipo> getClubesProhibidos() {
         return clubesProhibidos;
