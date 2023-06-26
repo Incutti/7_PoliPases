@@ -9,8 +9,15 @@ public class Jugador extends Persona{
         super();
         double salario=0;
         representante=new Representante();
-        posicion=new Posicion();
+        posicion=Posicion.DELANTERO;
     }
+
+    public Jugador(int dni, String nombre, String apellido, LocalDate fechaNacimiento, double salario, Posicion posicion) {
+        super(dni, nombre, apellido, fechaNacimiento);
+        this.salario = salario;
+        this.posicion = posicion;
+    }
+
     public Jugador(int dni, String nombre, String apellido, LocalDate fechaNacimiento, double salario, Representante representante, Posicion posicion) {
         super(dni, nombre, apellido, fechaNacimiento);
         this.salario = salario;
