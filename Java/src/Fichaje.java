@@ -6,6 +6,7 @@ public class Fichaje {
     private Jugador jugador;
     private Equipo club;
     private boolean completado;
+
     public Fichaje(int numeroCamiseta, LocalDateTime fechaHoraFichaje, Jugador jugador, Equipo club, boolean completado) {
         this.numeroCamiseta = numeroCamiseta;
         this.fechaHoraFichaje = fechaHoraFichaje;
