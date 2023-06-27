@@ -139,11 +139,14 @@ public class Sistema {
         }
     }
 
+    public void llenarDorsales(){
+        for(Fichaje f : historiaFichaje){
+              f.getClub().getDorsales().put(f.getNumeroCamiseta(), f.getJugador());
+        }
+    }
+
     public void traerRepresentante(){
         String consulta = "SELECT dniRepresentante,nombreRepresentante,apellidoRepresentante,Representante.fechaNacimiento,nombreEquipo,representante_habilitado from Representante join Representante_has_Equipo ON dniRepresentante=Representante_DNI join Equipo ON Equipo_idEquipo=idEquipo;";
-
-        // tenia la idea de hacer otra consulta en simultaneo para poder agregar el jugador pero no llegue 
-        String consulta1 = "SELECT DNI, nombreJugador, apellidoJugador, fechaNacimiento, salario"
         try {
             ResultSet data;
             PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
@@ -181,13 +184,21 @@ public class Sistema {
                     }
                 }
                 representante.setClubesContactados(clubesContactados);
-                // faltan los jugadores del representante
-                .setJugador(new Jugador(data.getInt("Jugador_id"),data.getString("nombreJugador"),data.getString("apellidoJugador"),LocalDate.parse(data.getString("fechaNacimiento")),data.getFloat("salario"),Posicion.valueOf(data.getString("upper(rol)"))));
+                String consulta1 = "select DNI,nombreAlumno,apellidoAlumno,fechaNacimiento,salario,upper(rol) from Jugador join Posicion on Jugador.Posicion_idPosicion = Posicion.id where Representante_DNI = "+data.getInt("dniRepresentante")+";";
+                ResultSet datosRepresentados;
+                PreparedStatement sentenciaRepresentados = accesoBase.getConexion().prepareStatement(consulta1);
+                datosRepresentados = sentenciaRepresentados.executeQuery(consulta1);
+                HashSet<Jugador>representados = new HashSet<>();
+                while (datosRepresentados.next() == true) {
+                    representados.add(new Jugador(data.getInt("Jugador_id"), data.getString("nombreJugador"), data.getString("apellidoJugador"), LocalDate.parse(data.getString("fechaNacimiento")), data.getFloat("salario"), Posicion.valueOf(data.getString("upper(rol)"))));
+                }
+                representante.setJugadoresRepresentados(representados);
                 listaManager.add(representante);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-        }}
+        }
+    }
 
 
     public void jugadorMasJovenFichado(){
@@ -391,7 +402,7 @@ public class Sistema {
                 for(Fichaje fichaje:historiaFichaje){
                     if(fichaje.getClub().equals(equipo)){
                         String select="SELECT idFichaje from Fichaje WHERE "; // select para conseguir el id
-                        String consulta="call verificarFichaje();";
+                        String consulta="call verificarFichaje("+data.getInt("idFichaje")+");";
                         //en la linea de arriba hay q agregar los parametros, no sabia q poner pq no se me ocurrió como conseguir el id
                         try{
                             ResultSet data;
@@ -441,4 +452,4 @@ public class Sistema {
 }
 
 // Los metodos que tienen el nombre y un 2 al final son las versiones en java del ejercicio.
-// No borramos la version vieja (hecha con sql) pq nos dijo tincho q no lo hagamos.
+// No borramos la version vieja (hecha con sql) pq nos dijo tincho que no lo hagamos.
