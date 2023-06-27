@@ -270,6 +270,21 @@ public class Sistema {
 
     public HashMap<Posicion, Jugador> mejorPagoPorPosicion(){
         HashMap<Posicion, Jugador>hash = new HashMap<>();
+        String consulta = "select distinct rol,max(salario),any_value(DNI),any_value(nombreJugador),any_value(apellidoJugador),any_value(fechaNacimiento),any_value(Representante_DNI) from Jugador join Posicion on Jugador.Posicion_idPosicion = Posicion.id group by rol;";
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+
+            while (data.next() == true) {
+                Posicion rol = new Posicion(data.getString("rol"));
+                Jugador jugador = new Jugador(data.getInt("any_value(DNI)"),data.getString("any_value(nombreJugador)"),data.getString("any_value(apellidoJugador)"),data.getDate("any_value(fechaNacimiento)"),data.getDouble("max(salario)"),data.getInt("any_value(Representante_DNI)"),rol);
+                hash.put(rol,jugador);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
         return hash;
     }
 
@@ -314,12 +329,19 @@ public class Sistema {
 
         try {
             s1.accesoBase.conectar("alumno", "alumnoipm");
+<<<<<<< HEAD
             // s1.jugadoresPorClubPorPosicion();
             // s1.jugadorMasJovenFichado();
             s1.fichajeCaidoPorPosicion();
             s1.jugadorMalRepresentado();
             s1.managerRepetidoEnClub();
             s1.clubProhibidoMasRecurrente();
+=======
+            s1.jugadoresPorClubPorPosicion();
+            s1.jugadorMasJovenFichado();
+            s1. fichajeCaidoPorPosicion();
+            s1.mejorPagoPorPosicion();
+>>>>>>> Caserez-Centrone
         } catch (SQLException ex) {
             System.out.println(ex);
         }
