@@ -7,7 +7,7 @@ public class Representante extends Persona{
     private HashSet<Equipo>clubesContactados;
     private HashSet<Jugador>jugadoresRepresentados;
 
-    public Representante(int dni, String nombre, String apellido, Date fechaNacimiento, HashSet<Equipo> clubesProhibidos, HashSet<Equipo> clubesContactados, HashSet<Jugador> jugadoresRepresentados) {
+    public Representante(int dni, String nombre, String apellido, LocalDate fechaNacimiento, HashSet<Equipo> clubesProhibidos, HashSet<Equipo> clubesContactados, HashSet<Jugador> jugadoresRepresentados) {
         super(dni, nombre, apellido, fechaNacimiento);
         this.clubesProhibidos = clubesProhibidos;
         this.clubesContactados = clubesContactados;

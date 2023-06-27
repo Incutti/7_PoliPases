@@ -1,20 +1,32 @@
 import java.util.HashMap;
 
 public class Equipo {
+    private int id;
     private String nombre;
     private HashMap<Posicion,Integer> cantPermitidaPosicion;
     private HashMap<Integer, Jugador>dorsales;
 
-    public Equipo(String nombre, HashMap<Posicion, Integer> cantPermitidaPosicion, HashMap<Integer, Jugador> dorsales) {
+    public Equipo(int id, String nombre, HashMap<Posicion, Integer> cantPermitidaPosicion, HashMap<Integer, Jugador> dorsales) {
+        this.id = id;
         this.nombre = nombre;
         this.cantPermitidaPosicion = cantPermitidaPosicion;
         this.dorsales = dorsales;
     }
     public Equipo(){
+        id=40;
         nombre="nombre1";
         cantPermitidaPosicion=new HashMap<>();
         dorsales=new HashMap<>();
     }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getNombre() {
         return nombre;
     }

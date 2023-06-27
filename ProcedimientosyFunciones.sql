@@ -6,7 +6,7 @@ INSERT INTO `PoliPases`.`Equipo` (`idEquipo`, `nombreEquipo`) VALUES
 (3, 'Equipo C');
 INSERT INTO `PoliPases`.`Posicion` (`id`, `rol`) VALUES
 (1, 'Delantero'),
-(2, 'Centrocampista'),
+(2, 'Mediocampista'),
 (3, 'Defensa');
 INSERT INTO `PoliPases`.`Equipo_has_Posicion` (`Equipo_id`, `idPosicion`, `cantidadPermitida`) VALUES
 (1, 1, 3),
@@ -236,46 +236,3 @@ begin
 end//
 
 delimiter ; 
-
--- para java 
-
-/*
-
-esto es del c
-
-delimiter //
-drop function if exists jugadoresManagerClub//
-create function jugadoresManagerClub(club int)
-returns INT
-DETERMINISTIC
-begin
-	DECLARE cant INT default 0;
-    DECLARE dnirep INT default 0;
-    select dniRepresentante, count(Jugador.DNI) into dnirep, cant from Jugador
-    left join Representante on Jugador.Representante_DNI = Representante.dniRepresentante 
-	left join Representante_has_Equipo on Representante.dniRepresentante = Representante_has_Equipo.Representante_DNI
-    where Representante_has_Equipo.Equipo_idEquipo = club 
-    group by dniRepresentante;
-    return cant;
-end//
-delimiter ;
-select jugadoresManagerClub(1) as jugadoresManagerClub;
-
-esto es del d
-
-DECLARE dniI int;
-    DECLARE nombre varchar(45);
-    DECLARE apellido varchar(45);
-    DECLARE nacimiento date;
-    DECLARE salarioAlto DECIMAL(10,2);
-    DECLARE repDNI int;
-    DECLARE rolId int;
-    DECLARE fichajeId int;
-	select Posicion_idPosicion ,DNI,nombreJugador, apellidoJugador,fechaNacimiento,salario,Representante_DNI,idFichaje  
-    from Jugador join Fichaje on DNI=Jugador_id group by Posicion_idPosicion ,DNI,nombreJugador, apellidoJugador,fechaNacimiento,salario,Representante_DNI,idFichaje 
-    order by salario desc limit 1
-    into rolId, dniI, nombre, apellido, nacimiento, salarioAlto, repDNI, fichajeId;
-	set mayorSalario = concat("Id posicion: ", rolId, ", DNI: ", dniI, ", Nombre: ", nombre, ", Apellido: ", apellido,
-    ", Nacimiento: ", nacimiento, ", Salario: ",  salarioAlto, ", Dni Representante:", repDNI,
-    ", Id posicion: ", rolId, ", Id fichaje: ",fichajeId);
-*/

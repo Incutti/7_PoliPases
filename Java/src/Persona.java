@@ -1,13 +1,13 @@
 import java.time.LocalDate;
-import java.sql.Date;
+import java.time.LocalDateTime;
 
 public class Persona {
     private int dni;
     private String nombre;
     private String apellido;
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
-    public Persona(int dni, String nombre, String apellido, Date fechaNacimiento) {
+    public Persona(int dni, String nombre, String apellido, LocalDate fechaNacimiento) {
         this.dni = dni;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -17,7 +17,7 @@ public class Persona {
         dni=233712;
         nombre="pepe";
         apellido="Perez";
-        fechaNacimiento= new Date(10,2,2004);
+        fechaNacimiento= LocalDate.now();
     }
 
     public int getDni() {
@@ -44,11 +44,11 @@ public class Persona {
         this.apellido = apellido;
     }
 
-    public Date getFechaNacimiento() {
+    public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(Date fechaNacimiento) {
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 }
