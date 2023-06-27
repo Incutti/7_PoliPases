@@ -281,6 +281,6 @@ DECLARE dniI int;
 */
 delimiter ;
 
-select distinct rol,max(salario),DNI,nombreJugador,apellidoJugador,fechaNacimiento,Representante_DNI from Jugador 
+select distinct rol,max(salario),any_value(DNI),any_value(nombreJugador),any_value(apellidoJugador),any_value(fechaNacimiento),any_value(Representante_DNI) from Jugador 
 join Posicion on Jugador.Posicion_idPosicion = Posicion.id 
 group by rol;

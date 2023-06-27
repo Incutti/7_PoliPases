@@ -130,9 +130,7 @@ public class Sistema {
 
     public HashMap<Posicion, Jugador> mejorPagoPorPosicion(){
         HashMap<Posicion, Jugador>hash = new HashMap<>();
-        String consulta = "select rol,max(salario),DNI,nombreJugador,apellidoJugador,fechaNacimiento,Representante_DNI from Jugador \n" +
-                "join Posicion on Jugador.Posicion_idPosicion = Posicion.id \n" +
-                "group by rol;";
+        String consulta = "select distinct rol,max(salario),any_value(DNI),any_value(nombreJugador),any_value(apellidoJugador),any_value(fechaNacimiento),any_value(Representante_DNI) from Jugador join Posicion on Jugador.Posicion_idPosicion = Posicion.id group by rol;";
         try {
             ResultSet data;
             PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
@@ -140,7 +138,7 @@ public class Sistema {
 
             while (data.next() == true) {
                 Posicion rol = new Posicion(data.getString("rol"));
-                Jugador jugador = new Jugador(data.getInt("DNI"),data.getString("nombreJugador"),data.getString("apellidoJugador"),data.getDate("fechaNacimiento"),data.getDouble("max(salario)"),data.getInt("Representante_DNI"),rol);
+                Jugador jugador = new Jugador(data.getInt("any_value(DNI)"),data.getString("any_value(nombreJugador)"),data.getString("any_value(apellidoJugador)"),data.getDate("any_value(fechaNacimiento)"),data.getDouble("max(salario)"),data.getInt("any_value(Representante_DNI)"),rol);
                 hash.put(rol,jugador);
             }
 
@@ -170,7 +168,7 @@ public class Sistema {
         s1.accesoBase = new AccesoBaseDeDatos("PoliPases", s1.tablas);
 
         try {
-            s1.accesoBase.conectar("root", "0212");
+            s1.accesoBase.conectar("alumno", "alumnoipm");
             s1.jugadoresPorClubPorPosicion();
             s1.jugadorMasJovenFichado();
             s1. fichajeCaidoPorPosicion();
