@@ -141,6 +141,9 @@ public class Sistema {
 
     public void traerRepresentante(){
         String consulta = "SELECT dniRepresentante,nombreRepresentante,apellidoRepresentante,Representante.fechaNacimiento,nombreEquipo,representante_habilitado from Representante join Representante_has_Equipo ON dniRepresentante=Representante_DNI join Equipo ON Equipo_idEquipo=idEquipo;";
+
+        // tenia la idea de hacer otra consulta en simultaneo para poder agregar el jugador pero no llegue 
+        String consulta1 = "SELECT DNI, nombreJugador, apellidoJugador, fechaNacimiento, salario"
         try {
             ResultSet data;
             PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
@@ -377,13 +380,34 @@ public class Sistema {
     }
 
     public void correccionFichaje(){
+        HashMap <Equipo, Integer> fichajesCaidosPorEquipo=new HashMap<>();
+        for(Fichaje fichaje:historiaFichaje){
+            if(!fichaje.isCompletado()){
+                fichajesCaidosPorEquipo.put(fichaje.getClub(),fichajesCaidosPorEquipo.get(fichaje.getClub())+1);
+            }
+        }
+        for(Map.Entry<Equipo, Integer> equipo:fichajesCaidosPorEquipo.entrySet()){
+            if(equipo.getValue()>3){
+                for(Fichaje fichaje:historiaFichaje){
+                    if(fichaje.getClub().equals(equipo)){
+                        String select="SELECT idFichaje from Fichaje WHERE "; // select para conseguir el id
+                        String consulta="call verificarFichaje();";
+                        //en la linea de arriba hay q agregar los parametros, no sabia q poner pq no se me ocurrió como conseguir el id
+                        try{
+                            ResultSet data;
+                            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
+                            data = sentenciaSQL.executeQuery(consulta);
+                        }
+                        catch(SQLException ex) {
+                            ex.printStackTrace();
+                        }
 
+                    }
+                }
+            }
+        }
     }
 
-    public HashSet<Representante> managerRepetido(){
-        HashSet<Representante>representantes = new HashSet<>();
-        return representantes;
-    }
     public static void main(String[] args) {
         Sistema s1= new Sistema();
 
@@ -416,6 +440,5 @@ public class Sistema {
     }
 }
 
-// A los metodos que tienen el nombre y un 2 al final son las versiones en java del ejercicio.
+// Los metodos que tienen el nombre y un 2 al final son las versiones en java del ejercicio.
 // No borramos la version vieja (hecha con sql) pq nos dijo tincho q no lo hagamos.
-// El F (de java) si no lo llegaron a hacer con sql, no hace falta terminarlo, solo haganlo en Java.
