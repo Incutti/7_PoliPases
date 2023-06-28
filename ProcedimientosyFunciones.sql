@@ -20,8 +20,8 @@ INSERT INTO `PoliPases`.`Representante` (`dniRepresentante`, `nombreRepresentant
 INSERT INTO `PoliPases`.`Jugador` (`DNI`, `nombreJugador`, `apellidoJugador`, `fechaNacimiento`, `salario`, `Representante_DNI`, `Posicion_idPosicion`) VALUES
 (11111111, 'Jugador A', 'Apellido A', '1995-08-20', 5000.00, 12345678, 1),
 (22222222, 'Jugador B', 'Apellido B', '1998-02-10', 4000.00, 87654321, 2),
-(33333333, 'Jugador C', 'Apellido C', '1993-11-05', 6000.00, 12345678, 3);
-insert into Jugador values (11111112, 'Jugador D', 'Apelldo D',  '1998-02-10', 4000.00, 87654321, 1);
+(33333333, 'Jugador C', 'Apellido C', '1993-11-05', 6000.00, 12345678, 3),
+(11111112, 'Jugador D', 'Apelldo D',  '1998-02-10', 4000.00, 12345678, 1);
 INSERT INTO `PoliPases`.`Representante_has_Equipo` (`Representante_DNI`, `Equipo_idEquipo`, `Representante_habilitado`) VALUES
 (12345678, 1, 1),
 (87654321, 2, 1),
@@ -29,8 +29,8 @@ INSERT INTO `PoliPases`.`Representante_has_Equipo` (`Representante_DNI`, `Equipo
 INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje`, `Equipo_id`, `Jugador_id`) VALUES
 (1, '10', '2023-06-01 10:00:00', 1,11111111),
 (2, '7', '2023-06-02 15:30:00', 2,22222222),
-(3, '5', '2023-06-03 12:45:00', 3,33333333);
-
+(3, '5', '2023-06-03 12:45:00', 3,33333333),
+(4, '20', '2023-06-02 15:30:00', 1,11111112);
 #a Procedimiento que liste los jugadores por club.
 
 drop view if exists jugadoresPorClub;
@@ -236,3 +236,8 @@ begin
 end//
 
 delimiter ; 
+
+SELECT idFichaje,idEquipo,nombreEquipo,numCamiseta,fechaHoraFichaje,Jugador_id,nombreJugador,apellidoJugador,Jugador.fechaNacimiento,Jugador.salario,upper(rol),Jugador.Representante_DNI FROM Equipo JOIN Equipo_has_Posicion ON idEquipo = Equipo_has_Posicion.Equipo_id JOIN Posicion ON idPosicion=id JOIN Fichaje ON Fichaje.Equipo_id=idEquipo JOIN Jugador ON Jugador_id=DNI;
+select nombreJugador,apellidoJugador,fechaNacimiento,salario,Representante_DNI,Posicion_idPosicion,idFichaje,numCamiseta,fechaHoraFichaje,Equipo_id,Jugador_id from Fichaje 
+join Jugador on Fichaje.Jugador_id = Jugador.DNI 
+join Posicion on Jugador.Posicion_idPosicion=Posicion.id;

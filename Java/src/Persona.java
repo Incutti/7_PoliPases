@@ -17,7 +17,7 @@ public class Persona {
         dni=233712;
         nombre="pepe";
         apellido="Perez";
-        fechaNacimiento= LocalDate.now();
+        fechaNacimiento= LocalDate.of(1800,10,10);
     }
 
     public int getDni() {
@@ -50,5 +50,15 @@ public class Persona {
 
     public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
+    }
+
+    @Override
+    public String toString() {
+        return "Persona{" +
+                "dni=" + dni +
+                ", nombre='" + nombre + '\'' +
+                ", apellido='" + apellido + '\'' +
+                ", fechaNacimiento=" + fechaNacimiento +
+                '}';
     }
 }

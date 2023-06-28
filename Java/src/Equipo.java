@@ -54,4 +54,14 @@ public class Equipo {
     public void jugadoresMalRepresentados(){
 
     }
+
+    @Override
+    public String toString() {
+        return "Equipo{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", cantPermitidaPosicion=" + cantPermitidaPosicion +
+                ", dorsales=" + dorsales +
+                '}';
+    }
 }

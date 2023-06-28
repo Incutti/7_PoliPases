@@ -42,4 +42,13 @@ public class Representante extends Persona{
     public void setJugadoresRepresentados(HashSet<Jugador> jugadoresRepresentados) {
         this.jugadoresRepresentados = jugadoresRepresentados;
     }
+
+    @Override
+    public String toString() {
+        return super.toString()+"Representante{" +
+                "clubesProhibidos=" + clubesProhibidos +
+                ", clubesContactados=" + clubesContactados +
+                ", jugadoresRepresentados=" + jugadoresRepresentados +
+                '}';
+    }
 }

@@ -57,33 +57,9 @@ public class Sistema {
         this.accesoBase = accesoBase;
     }
 
-    public void jugadoresPorClubPorPosicion() {
-        String consulta = "SELECT * FROM jugadoresPorClub;";
-        ArrayList<String> nombreCampos = new ArrayList<>();
-        try {
-            ResultSet data;
-            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
-            data = sentenciaSQL.executeQuery(consulta);
-            while (data.next()) {
-                nombreCampos.add(data.getString("nombreJugador"));
-                nombreCampos.add(data.getString("apellidoJugador"));
-                nombreCampos.add(data.getString("nombreEquipo"));
-                nombreCampos.add(data.getString("rol"));
-                nombreCampos.add("\n");
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        System.out.println("Ejercicio A");
-        for(String campo:nombreCampos){
-            System.out.println(campo);
-        }
-    }
-
     public void traerFichajes(){
-        String consulta = " SELECT idEquipo,nombreEquipo,cantidadPermitida,numCamiseta,fechaHoraFichaje,Jugador_id,nombreJugador,apellidoJugador,Jugador.fechaNacimiento,Jugador.salario,upper(rol)"+/*,completado*/",Jugador.Representante_DNI FROM Equipo JOIN Equipo_has_Posicion ON idEquipo = Equipo_has_Posicion.Equipo_id JOIN Posicion ON idPosicion=id JOIN Fichaje ON Fichaje.Equipo_id=idEquipo JOIN Jugador ON Jugador_id=DNI;";
+        String consulta = "select nombreJugador,apellidoJugador,fechaNacimiento,salario,upper(rol),Representante_DNI,Posicion_idPosicion,idFichaje,numCamiseta,fechaHoraFichaje,Equipo_id,Jugador_id from Fichaje join Jugador on Fichaje.Jugador_id = Jugador.DNI join Posicion on Jugador.Posicion_idPosicion=Posicion.id;";
         Representante managerJugador = new Representante();
-        HashMap<Posicion,Integer> cantidadPermitidaPosicion =new HashMap<Posicion,Integer>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         try {
             ResultSet data;
@@ -91,6 +67,7 @@ public class Sistema {
             data = sentenciaSQL.executeQuery(consulta);
             while (data.next()) {
                 Fichaje fichajeNuevo =new Fichaje();
+                fichajeNuevo.setIdFichaje(data.getInt("idFichaje"));
                 fichajeNuevo.setNumeroCamiseta(data.getInt("numCamiseta"));
                 fichajeNuevo.setFechaHoraFichaje(LocalDateTime.parse(data.getString("fechaHoraFichaje"),formatter));
                 //Hay que traer primero los Representantes
@@ -100,8 +77,11 @@ public class Sistema {
                     }
                 }
                 fichajeNuevo.setJugador(new Jugador(data.getInt("Jugador_id"),data.getString("nombreJugador"),data.getString("apellidoJugador"),LocalDate.parse(data.getString("fechaNacimiento")),data.getFloat("salario"),managerJugador,Posicion.valueOf(data.getString("upper(rol)"))));
-                cantidadPermitidaPosicion.put(Posicion.valueOf(data.getString("upper(rol)")),data.getInt("cantidadPermitida"));
-                fichajeNuevo.setClub(new Equipo(data.getInt("idEquipo"),data.getString("nombreEquipo"),cantidadPermitidaPosicion,new HashMap<>()));
+                for(Equipo e: listaEquipos){
+                    if(data.getInt("Equipo_id") == e.getId()) {
+                        fichajeNuevo.setClub(e);
+                    }
+                }
                 /* falta poner el booleano de completo o no, podriamos ponerlo en la base o no c*/
                 historiaFichaje.add(fichajeNuevo);
             }
@@ -112,7 +92,7 @@ public class Sistema {
 
 
     public void traerEquipos(){
-        String consulta = "SELECT idEquipo,nombreEquipo FROm Equipo;";
+        String consulta = "SELECT idEquipo,nombreEquipo FROM Equipo;";
         try {
             ResultSet data;
             PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
@@ -192,7 +172,7 @@ public class Sistema {
                 datosRepresentados = sentenciaRepresentados.executeQuery(consulta1);
                 HashSet<Jugador>representados = new HashSet<>();
                 while (datosRepresentados.next() == true) {
-                    representados.add(new Jugador(datosRepresentados.getInt("Jugador_id"), datosRepresentados.getString("nombreJugador"), datosRepresentados.getString("apellidoJugador"), LocalDate.parse(datosRepresentados.getString("fechaNacimiento")), datosRepresentados.getFloat("salario"), Posicion.valueOf(datosRepresentados.getString("upper(rol)"))));
+                    representados.add(new Jugador(datosRepresentados.getInt("DNI"), datosRepresentados.getString("nombreJugador"), datosRepresentados.getString("apellidoJugador"), LocalDate.parse(datosRepresentados.getString("fechaNacimiento")), datosRepresentados.getFloat("salario"), Posicion.valueOf(datosRepresentados.getString("upper(rol)"))));
                 }
                 representante.setJugadoresRepresentados(representados);
                 listaManager.add(representante);
@@ -202,6 +182,29 @@ public class Sistema {
         }
     }
 
+
+    public void jugadoresPorClubPorPosicion() {
+        String consulta = "SELECT * FROM jugadoresPorClub;";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+            while (data.next()) {
+                nombreCampos.add(data.getString("nombreJugador"));
+                nombreCampos.add(data.getString("apellidoJugador"));
+                nombreCampos.add(data.getString("nombreEquipo"));
+                nombreCampos.add(data.getString("rol"));
+                nombreCampos.add("\n");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        System.out.println("Ejercicio A");
+        for(String campo:nombreCampos){
+            System.out.println(campo);
+        }
+    }
 
     public void jugadorMasJovenFichado(){
         String consulta = "SELECT fechaNacimiento, DNI, apellidoJugador, nombreEquipo FROM Jugador JOIN Fichaje ON DNI=Jugador_id JOIN Equipo ON Equipo_id=idEquipo WHERE fechaNacimiento= (SELECT min(fechaNacimiento)FROM Jugador);";
@@ -226,11 +229,11 @@ public class Sistema {
         }
     }
     public Jugador jugadorMasJovenFichado2() {
-        LocalDateTime masJoven = LocalDateTime.now();
+        LocalDate masJoven =  LocalDate.now();
         Jugador jugadorMasJoven=new Jugador();
         for(Fichaje fichaje:historiaFichaje) {
-            if(fichaje.getFechaHoraFichaje().compareTo(masJoven)==-1) {
-                masJoven=fichaje.getFechaHoraFichaje();
+            if(fichaje.getJugador().getFechaNacimiento().compareTo(masJoven)<0) {
+                masJoven=fichaje.getJugador().getFechaNacimiento();
                 jugadorMasJoven=fichaje.getJugador();
             }
         }
@@ -263,7 +266,7 @@ public class Sistema {
     }
 
     public void jugadorMalRepresentado(){
-        String consulta = "SELECT nombreJugador, apellidoJugador FROM Jugador JOIN Fichaje ON DNI=Jugador_id WHERE !verificarManager(idFichaje);";
+        String consulta = "SELECT distinct nombreJugador, apellidoJugador FROM Jugador JOIN Fichaje ON DNI=Jugador_id WHERE !verificarManager(idFichaje);";
         ArrayList<String> nombreCampos = new ArrayList<>();
         try {
             ResultSet data;
@@ -273,8 +276,6 @@ public class Sistema {
             while (data.next()) {
                 nombreCampos.add(data.getString("nombreJugador"));
                 nombreCampos.add(data.getString("apellidoJugador"));
-                nombreCampos.add("\n");
-
             }
 
         } catch (SQLException ex) {
@@ -287,7 +288,7 @@ public class Sistema {
     }
 
     public void managerRepetidoEnClub(){
-        String consulta = "select distinct Representante_DNI, nombreRepresentante, apellidoRepresentante from Representante_has_Equipo join Representante on Representante_DNI=dniRepresentante where 2>jugadoresManagerClub(Representante_DNI, Equipo_idEquipo);";
+        String consulta = "select distinct Representante_DNI, nombreRepresentante, apellidoRepresentante from Representante_has_Equipo join Representante on Representante_DNI=dniRepresentante where 2<jugadoresManagerClub(Representante_DNI, Equipo_idEquipo);";
         ArrayList<String> nombreCampos = new ArrayList<>();
         try {
             ResultSet data;
@@ -312,16 +313,24 @@ public class Sistema {
 
     public HashSet<Representante> managerRepetidoEnClub2() {
         HashSet<Representante> managersRepetidos=new HashSet<>();
+        HashMap<Representante, Integer> managersCompletos=new HashMap<>();
         for(Equipo equipo:listaEquipos){
-            HashMap<Representante, Integer> managersCompletos=new HashMap<>();
             for (Map.Entry<Integer, Jugador> dorsal:equipo.getDorsales().entrySet()) {
-                managersCompletos.put(dorsal.getValue().getRepresentante(), managersCompletos.get(dorsal.getValue().getRepresentante())+1);
+                if(managersCompletos.containsKey(dorsal.getValue().getRepresentante())) {
+                    managersCompletos.put(dorsal.getValue().getRepresentante(), managersCompletos.get(dorsal.getValue().getRepresentante()) + 1);
+                }else{
+                    managersCompletos.put(dorsal.getValue().getRepresentante(), 1);
+                }
             }
             for (Map.Entry<Representante, Integer> representante:managersCompletos.entrySet()) {
                 if(representante.getValue()>2){
                     managersRepetidos.add(representante.getKey());
                 }
             }
+        }
+        System.out.println("Ejercicio E");
+        for(Representante r: managersRepetidos){
+            System.out.println(r.toString());
         }
         return managersRepetidos;
     }
@@ -393,22 +402,30 @@ public class Sistema {
     }
 
     public void correccionFichaje(){
+        System.out.println("EJERCICIO H");
         HashMap <Equipo, Integer> fichajesCaidosPorEquipo=new HashMap<>();
         for(Fichaje fichaje:historiaFichaje){
             if(!fichaje.isCompletado()){
-                fichajesCaidosPorEquipo.put(fichaje.getClub(),fichajesCaidosPorEquipo.get(fichaje.getClub())+1);
+//                if(fichajesCaidosPorEquipo.size()==0){
+//                    fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
+//
+//                } else{
+//                    if(fichajesCaidosPorEquipo.get(fichaje.getClub()) == (null)){
+//                        fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
+//
+//                    }else{
+                    fichajesCaidosPorEquipo.put(fichaje.getClub(),(fichajesCaidosPorEquipo.get(fichaje.getClub()) == null )? 1:fichajesCaidosPorEquipo.get(fichaje.getClub()) +1);
+//                }}
             }
         }
         for(Map.Entry<Equipo, Integer> equipo:fichajesCaidosPorEquipo.entrySet()){
             if(equipo.getValue()>3){
                 for(Fichaje fichaje:historiaFichaje){
                     if(fichaje.getClub().equals(equipo)){
-                        String select="SELECT idFichaje from Fichaje WHERE "; // select para conseguir el id
-                        String consulta="call verificarFichaje();";
-                        //en la linea de arriba hay q agregar los parametros, no sabia q poner pq no se me ocurrió como conseguir el id
+                        String consulta="{call verificarFichaje("+fichaje.getIdFichaje()+", errorPosicion VARCHAR(100))};";
                         try{
                             ResultSet data;
-                            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
+                            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareCall(consulta);
                             data = sentenciaSQL.executeQuery(consulta);
                         }
                         catch(SQLException ex) {
@@ -423,22 +440,20 @@ public class Sistema {
 
     public static void main(String[] args) {
         Sistema s1= new Sistema();
-
         s1.tablas = Arrays.asList("Jugador", "Posicion", "Fichaje", "Equipo", "Representante", "Representante_has_Equipo", "Equipo_has_Posicion");
         s1.accesoBase = new AccesoBaseDeDatos("PoliPases", s1.tablas);
-
         try {
             s1.accesoBase.conectar("alumno", "alumnoipm");
-            s1.traerEquipos();
-            s1.traerRepresentante();
-            for(Equipo e: s1.getListaEquipos()){
-                System.out.println("Equipo: " + e.getNombre());
-                for(Map.Entry<Posicion,Integer>entry : e.getCantPermitidaPosicion().entrySet()){
-                    System.out.println("Posicion: " + entry.getKey() + " Cantidad: " + entry.getValue());
-                }
-            }
-            s1.traerFichajes();
-            s1.llenarDorsales();
+            s1.traerEquipos();//Primero Clubes
+            s1.traerRepresentante();//Despues Representantes
+            s1.traerFichajes();//Despues Fichajes
+            s1.llenarDorsales();//Despues los Dorsales
+            //Si no se pone en este Orden no funciona
+            s1.jugadoresPorClubPorPosicion();
+            s1.jugadorMasJovenFichado();
+            s1.managerRepetidoEnClub2();
+            System.out.println(s1.jugadorMasJovenFichado2().getDni());
+            System.out.println(s1.jugadorMasJovenFichado2().getNombre());
             s1.fichajeCaidoPorPosicion();
             s1.jugadorMalRepresentado();
             s1.managerRepetidoEnClub();
@@ -448,6 +463,7 @@ public class Sistema {
             for(Map.Entry<Posicion,Jugador>entry : hash.entrySet()){
                 System.out.println("Posicion: " + entry.getKey() + ": Jugador: " + entry.getValue().getSalario());
             }
+            s1.correccionFichaje();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
