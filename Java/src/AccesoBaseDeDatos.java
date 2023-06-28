@@ -39,6 +39,7 @@ public class AccesoBaseDeDatos {
         this.nombreTabla = nombreTabla;
     }
 
+
     public void conectar(String user, String password) throws SQLException {
         String url = "jdbc:mysql://localhost:3306/"+nombreBaseDeDatos;
         try {
@@ -139,7 +140,6 @@ public class AccesoBaseDeDatos {
         }
         return existe;
     }
-
 
     public String obtenerValorDeUnCampo(String nombreTabla, String nombreCampo, int id){
         ResultSet data;

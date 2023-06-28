@@ -57,6 +57,7 @@ public class Sistema {
         this.accesoBase = accesoBase;
     }
 
+
     public void traerFichajes(){
         String consulta = "select nombreJugador,apellidoJugador,fechaNacimiento,salario,upper(rol),Representante_DNI,Posicion_idPosicion,idFichaje,numCamiseta,fechaHoraFichaje,Equipo_id,Jugador_id from Fichaje join Jugador on Fichaje.Jugador_id = Jugador.DNI join Posicion on Jugador.Posicion_idPosicion=Posicion.id;";
         Representante managerJugador = new Representante();
@@ -89,7 +90,6 @@ public class Sistema {
             ex.printStackTrace();
         }
     }
-
 
     public void traerEquipos(){
         String consulta = "SELECT idEquipo,nombreEquipo FROM Equipo;";
@@ -182,7 +182,6 @@ public class Sistema {
         }
     }
 
-
     public void jugadoresPorClubPorPosicion() {
         String consulta = "SELECT * FROM jugadoresPorClub;";
         ArrayList<String> nombreCampos = new ArrayList<>();
@@ -228,6 +227,7 @@ public class Sistema {
             System.out.println(campo);
         }
     }
+
     public Jugador jugadorMasJovenFichado2() {
         LocalDate masJoven =  LocalDate.now();
         Jugador jugadorMasJoven=new Jugador();
@@ -437,6 +437,7 @@ public class Sistema {
             }
         }
     }
+
 
     public static void main(String[] args) {
         Sistema s1= new Sistema();
