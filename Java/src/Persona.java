@@ -17,7 +17,7 @@ public class Persona {
         dni=233712;
         nombre="pepe";
         apellido="Perez";
-        fechaNacimiento= LocalDate.now();
+        fechaNacimiento= LocalDate.of(1800,10,10);
     }
 
     public int getDni() {
