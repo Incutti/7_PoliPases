@@ -444,7 +444,7 @@ public class Sistema {
         s1.tablas = Arrays.asList("Jugador", "Posicion", "Fichaje", "Equipo", "Representante", "Representante_has_Equipo", "Equipo_has_Posicion");
         s1.accesoBase = new AccesoBaseDeDatos("PoliPases", s1.tablas);
         try {
-            s1.accesoBase.conectar("alumno", "alumnoipm");
+            s1.accesoBase.conectar("root", "0212");
             s1.traerEquipos();//Primero Clubes
             s1.traerRepresentante();//Despues Representantes
             s1.traerFichajes();//Despues Fichajes

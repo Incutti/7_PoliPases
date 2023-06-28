@@ -25,12 +25,16 @@ INSERT INTO `PoliPases`.`Jugador` (`DNI`, `nombreJugador`, `apellidoJugador`, `f
 INSERT INTO `PoliPases`.`Representante_has_Equipo` (`Representante_DNI`, `Equipo_idEquipo`, `Representante_habilitado`) VALUES
 (12345678, 1, 1),
 (87654321, 2, 1),
-(12345678, 3, 0);
+(12345678, 3, 0),
+(12345678, 2, 0);
 INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje`, `Equipo_id`, `Jugador_id`) VALUES
 (1, '10', '2023-06-01 10:00:00', 1,11111111),
 (2, '7', '2023-06-02 15:30:00', 2,22222222),
 (3, '5', '2023-06-03 12:45:00', 3,33333333),
-(4, '20', '2023-06-02 15:30:00', 1,11111112);
+(4, '20', '2023-06-02 15:30:00', 1,11111112),
+(5, 13, '2023-06-02 15:30:00', 2, 11111112),
+(6, 13, '2023-06-02 15:30:00', 2, 11111112),
+(7, 24, '2023-06-02 15:30:00', 2, 11111111);
 #a Procedimiento que liste los jugadores por club.
 
 drop view if exists jugadoresPorClub;
@@ -144,8 +148,10 @@ deterministic
 begin 
 	declare verificacion boolean default false;
 	declare idEquipoFichaje int;
+    declare idRepresentante int;
     select Equipo_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje;
-    if (select Representante_habilitado from Representante_has_Equipo where Equipo_idEquipo=idEquipoFichaje) = 1
+    select Representante_DNI into idRepresentante from Jugador where DNI = (select Jugador_id from fichaje where idFichaje = idDeFichaje);
+    if (select Representante_habilitado from Representante_has_Equipo where Equipo_idEquipo=idEquipoFichaje and Representante_DNI = idRepresentante) = 1
 		then 
         set verificacion = true;
 	end if;
@@ -166,11 +172,9 @@ begin
     declare idEquipoFichaje int;
 	select Equipo_id, Jugador_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje, idJugador;
     select Posicion_idPosicion into idPosicionFichaje from Jugador where DNI = idJugador;
-    select count(Jugador.DNI) from Equipo join Equipo_has_Posicion on Equipo.idEquipo = Equipo_has_Posicion.Equipo_id
-    join Posicion on Equipo_has_Posicion.idPosicion = Posicion.id
-    join Jugador on Posicion.id = Jugador.Posicion_idPosicion
-    where Equipo.idEquipo = idEquipoFichaje and Posicion.id = idPosicionFichaje into cantidadDePos;
-    if (cantidadDePos < (select cantidadPermitida from Equipo_has_Posicion where Equipo_id = idEquipoFichaje and idPosicion = idPosicionFichaje) )
+    select count(Jugador_id) from Fichaje join Jugador on Jugador.DNI = Fichaje.Jugador_id
+    where Fichaje.Equipo_id = idEquipoFichaje and Jugador.Posicion_idPosicion = idPosicionFichaje into cantidadDePos;
+    if (cantidadDePos > (select cantidadPermitida from Equipo_has_Posicion where Equipo_id = idEquipoFichaje and idPosicion = idPosicionFichaje) )
 		then 
         set verificacion = false;
 	end if;
@@ -189,19 +193,20 @@ begin
     declare idEquipoFichaje int;
     declare numCamisetaFichaje int;
     declare numCamisaCur int;
-    declare cur cursor for select numCamiseta from Fichaje where Equipo_id = idEquipoFichaje;
+    declare idFichajeCur int;
+    declare cur cursor for select numCamiseta,idFichaje from Fichaje where Equipo_id = idEquipoFichaje;
     declare continue handler for not found set done = 1;
-    open cur;
-    select Equipo_id into idEquipoFichaje from Fichaje where idFichaje = idDeFichaje;
+    select Equipo_id from Fichaje where idFichaje = idDeFichaje into idEquipoFichaje;
     select numCamiseta from Fichaje where idFichaje = idDeFichaje into numCamisetaFichaje;
+    open cur;
     recorrer : LOOP
-		fetch cur into numCamisaCur;
+		fetch cur into numCamisaCur, idFichajeCur;
         if done = 1 then
 			leave recorrer;
 		end if;
-		if  numCamisetaFichaje = numCamisaCur then 
-			leave recorrer;
+		if  numCamisetaFichaje = numCamisaCur and idFichajeCur <> idDeFichaje then 
 			set verificacion = false;
+            leave recorrer;
 		end if;
 	end LOOP;
     close cur;
@@ -212,14 +217,15 @@ delimiter ;
 delimiter //
 
 drop procedure if exists verificarFichaje//
-create procedure verificarFichaje(IN idDeFichaje INT, errorPosicion VARCHAR(100))
+create procedure verificarFichaje(IN idDeFichaje INT, OUT errorPosicion VARCHAR(100))
 begin
 	declare numeroCamiseta int default 1;
     declare representanteValido int;
 	if verificarManager(idDeFichaje) = false then
     #Le asigna un representante que tenga en el equipo 
-		select Representante_DNI from Representante_has_Equipo where Representante_habilitado = true 
+		select Representante_DNI into representanteValido from Representante_has_Equipo where Representante_habilitado = true 
         and Equipo_idEquipo in (select Equipo_id from Fichaje where idFichaje = idDeFichaje);
+        update Jugador set Representante_DNI = representanteValido where DNI = (select Jugador_id from Fichaje where idFichaje = idDeFichaje);
 	ELSEIF  verificarCamiseta(idDeFichaje) = false then
     #Le asigna el primer numero de camiseta que este disponible empezando del 1
 		cambiarNumero : LOOP
@@ -236,8 +242,3 @@ begin
 end//
 
 delimiter ; 
-
-SELECT idFichaje,idEquipo,nombreEquipo,numCamiseta,fechaHoraFichaje,Jugador_id,nombreJugador,apellidoJugador,Jugador.fechaNacimiento,Jugador.salario,upper(rol),Jugador.Representante_DNI FROM Equipo JOIN Equipo_has_Posicion ON idEquipo = Equipo_has_Posicion.Equipo_id JOIN Posicion ON idPosicion=id JOIN Fichaje ON Fichaje.Equipo_id=idEquipo JOIN Jugador ON Jugador_id=DNI;
-select nombreJugador,apellidoJugador,fechaNacimiento,salario,Representante_DNI,Posicion_idPosicion,idFichaje,numCamiseta,fechaHoraFichaje,Equipo_id,Jugador_id from Fichaje 
-join Jugador on Fichaje.Jugador_id = Jugador.DNI 
-join Posicion on Jugador.Posicion_idPosicion=Posicion.id;
