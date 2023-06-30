@@ -211,30 +211,41 @@ delimiter ;
 delimiter //
 
 drop procedure if exists verificarFichaje//
-create procedure verificarFichaje(IN idDeFichaje INT, OUT errorPosicion VARCHAR(100))
+create procedure verificarFichaje(IN idDeFichaje INT, OUT errorPosicion VARCHAR(100), OUT correccion VARCHAR(100))
 begin
 	declare numeroCamiseta int default 1;
     declare representanteValido int;
 	if verificarManager(idDeFichaje) = false then
+		set errorPosicion = "El manager no esta habilitado para ese club";
+		set correccion = concat(correccion, " Manager: de ", (select Representante_DNI from Jugador where DNI = (select Jugador_id from Fichaje where idFichaje = idDeFichaje)), " a ");
     #Le asigna un representante que tenga en el equipo 
 		select Representante_DNI into representanteValido from Representante_has_Equipo where Representante_habilitado = true 
-        and Equipo_idEquipo in (select Equipo_id from Fichaje where idFichaje = idDeFichaje);
+        and Equipo_idEquipo in (select Equipo_id from Fichaje where idFichaje = idDeFichaje) limit 1;
+		set correccion = concat(correccion, representanteValido);
         update Jugador set Representante_DNI = representanteValido where DNI = (select Jugador_id from Fichaje where idFichaje = idDeFichaje);
-	ELSEIF  verificarCamiseta(idDeFichaje) = false then
-    #Le asigna el primer numero de camiseta que este disponible empezando del 1
+	end if;
+	IF  verificarCamiseta(idDeFichaje) = false then
+		set errorPosicion =  "Camiseta repetida";
+		set correccion = concat(correccion, " Camiseta: de ", (select numCamiseta from Fichaje where idFichaje = idDeFichaje limit 1), " a ");
+		#Le asigna el primer numero de camiseta que este disponible empezando del 1
 		cambiarNumero : LOOP
 			update Fichaje set numCamiseta = numeroCamiseta where idFichaje = idDeFichaje;
             if verificarCamiseta(idDeFichaje) = true then
+				set correccion = concat(correccion, numeroCamiseta);
 				leave cambiarNumero;
 			else
 				set numeroCamiseta = numeroCamiseta + 1;
             end if;
         end loop;
-    elseif verificarPosicion(idDeFichaje) = false then
-		set errorPosicion = "No puede haber tantos jugadores en esa posicion";
+	end if;
+    if verificarPosicion(idDeFichaje) = false then
+		set errorPosicion = " No puede haber tantos jugadores en esa posicion";
 	end if;
 end//
 
 delimiter ; 
 
-
+call verificarFichaje(6,@error,@correcion);
+select @error,@correcion;
+select * from Fichaje;
+select * from Jugador;
