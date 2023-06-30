@@ -34,7 +34,10 @@ INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje
 (4, '20', '2023-06-02 15:30:00', 1,11111112),
 (5, 13, '2023-06-02 15:30:00', 2, 11111112),
 (6, 13, '2023-06-02 15:30:00', 2, 11111112),
-(7, 24, '2023-06-02 15:30:00', 2, 11111111);
+(7, 24, '2023-06-02 15:30:00', 2, 11111111),
+(8, 10, '2023-06-02 15:30:00', 1, 22222222),
+(9, 10, '2023-06-02 15:30:00', 1, 33333333),
+(10, 10, '2023-06-02 15:30:00', 1, 33333333);
 
 #a Procedimiento que liste los jugadores por club.
 drop view if exists jugadoresPorClub;
@@ -245,7 +248,17 @@ end//
 
 delimiter ; 
 
+<<<<<<< HEAD
 call verificarFichaje(6,@error,@correcion);
 select @error,@correcion;
 select * from Fichaje;
 select * from Jugador;
+=======
+call verificarFichaje(9,@variable);
+call verificarFichaje(8,@variable);
+call verificarFichaje(10,@variable);
+select * FROM Fichaje;
+update Fichaje set numCamiseta=10 where idFichaje=10 or idFichaje=9 or idFichaje=8;
+
+
+>>>>>>> origin/main
