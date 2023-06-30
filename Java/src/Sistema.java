@@ -197,7 +197,8 @@ public class Sistema {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        System.out.println("Ejercicio A");
+        System.out.println("EJERCICIO A");
+        System.out.println("Listado de jugadores por posición por club.");
         for(String campo:nombreCampos){
             System.out.println(campo);
         }
@@ -220,7 +221,8 @@ public class Sistema {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        System.out.println("Ejercicio B");
+        System.out.println("EJERCICIO B");
+        System.out.println("Jugador más joven en ser fichado por un club.");
         for(String campo:nombreCampos){
             System.out.println(campo);
         }
@@ -257,7 +259,8 @@ public class Sistema {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        System.out.println("Ejercicio C");
+        System.out.println("EJERCICIO C");
+        System.out.println("Fichajes en  los  cuales el  club  no  aceptaba más jugadores  en  esa posición.");
         for(String campo:nombreCampos){
             System.out.println(campo);
         }
@@ -279,7 +282,8 @@ public class Sistema {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        System.out.println("Ejercicio D");
+        System.out.println("EJERCICIO D");
+        System.out.println("Jugadores representados por managers que no corresponde.");
         for(String campo:nombreCampos){
             System.out.println(campo);
         }
@@ -303,7 +307,8 @@ public class Sistema {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        System.out.println("Ejercicio E");
+        System.out.println("EJERCICIO E");
+        System.out.println("Si establecemos la regla de que un manager no puede "+'\n'+"representar a másde 2 jugadores de un mismo club, listar todos los managers que rompen dicha regla.");
         for(String campo:nombreCampos){
             System.out.println(campo);
         }
@@ -326,7 +331,8 @@ public class Sistema {
                 }
             }
         }
-        System.out.println("Ejercicio E");
+        System.out.println("EJERCICIO E (version 2)");
+        System.out.println("Si establecemos la regla de que un manager no puede "+'\n'+"representar a másde 2 jugadores de un mismo club, listar todos los managers que rompen dicha regla.");
         for(Representante r: managersRepetidos){
             System.out.println("Nombre: " + r.getNombre() + " Apellido: " + r.getApellido() + " Dni: " + r.getDni() + " Fecha de Nacimiento: " + r.getFechaNacimiento());
         }
@@ -357,6 +363,8 @@ public class Sistema {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+        System.out.println("Ejercicio F");
+        System.out.println("Los jugadores mejores pagos por posición en el sistema de fichajes.");
         return hash;
     }
 
@@ -372,6 +380,8 @@ public class Sistema {
                 hash.put(p,j);
             }
         }
+        System.out.println("EJERCICIO F (version 2)");
+        System.out.println("Los jugadores mejores pagos por posición en el sistema de fichajes.");
         return hash;
     }
 
@@ -395,93 +405,50 @@ public class Sistema {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        System.out.println("Ejercicio G");
+        System.out.println("EJERCICIO G");
+        System.out.println("Equipo  de  futbol  que  acepta  la  menor  cantidad  de  managers  para sus jugadores.");
         for(String campo:nombreCampos){
             System.out.println(campo);
         }
 
     }
 
-
-
-    public void correccionFichaje(){
-        System.out.println("EJERCICIO H");
-        HashMap <Equipo, Integer> fichajesCaidosPorEquipo=new HashMap<>();
-        for(Fichaje fichaje:historiaFichaje){
-            if(!fichaje.isCompletado()){
-//                if(fichajesCaidosPorEquipo.size()==0){
-//                    fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
-//
-//                } else{
-//                    if(fichajesCaidosPorEquipo.get(fichaje.getClub()) == (null)){
-//                        fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
-//
-//                    }else{
-                    fichajesCaidosPorEquipo.put(fichaje.getClub(),(fichajesCaidosPorEquipo.get(fichaje.getClub()) == null )? 1:fichajesCaidosPorEquipo.get(fichaje.getClub()) +1);
-//                  Esta linea ^ reemplaza lo comentado
-//                }}
-            }
-        }
-        for(Map.Entry<Equipo, Integer> equipo:fichajesCaidosPorEquipo.entrySet()){
-            if(equipo.getValue()>3){
-                for(Fichaje fichaje:historiaFichaje){
-                    if(fichaje.getClub().equals(equipo)){
-                        String consulta="{call verificarFichaje("+fichaje.getIdFichaje()+", errorPosicion VARCHAR(100))};";
-                        try{
-                            ResultSet data;
-                            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareCall(consulta);
-                            data = sentenciaSQL.executeQuery(consulta);
-                        }
-                        catch(SQLException ex) {
-                            ex.printStackTrace();
-                        }
-
-                    }
-                }
-            }
-        }
-    }
-
     public void correccionFichaje2(){
         System.out.println("EJERCICIO H");
+        System.out.println("Debido  a  una  penalidad  que  pone  la  asociación  a  los  clubes  que tienen más de 3 fichajes rechazados "+'\n'+"(esto nos está sucediendo con 2  clubes)  se  pide modificar  los  fichajes  necesarios  para  que  se consideren aceptados los clubes y así eviten la sanción.");
         HashMap <Equipo, Integer> fichajesCaidosPorEquipo=new HashMap<>();
         for(Fichaje fichaje:historiaFichaje){
             if(!fichaje.isCompletado()){
-//                if(fichajesCaidosPorEquipo.size()==0){
-//                    fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
-//
-//                } else{
-//                    if(fichajesCaidosPorEquipo.get(fichaje.getClub()) == (null)){
-//                        fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
-//
-//                    }else{
                 fichajesCaidosPorEquipo.put(fichaje.getClub(),(fichajesCaidosPorEquipo.get(fichaje.getClub()) == null )? 1:fichajesCaidosPorEquipo.get(fichaje.getClub()) +1);
-//                  Esta linea ^ reemplaza lo comentado
-//                }}
             }
         }
         for(Map.Entry<Equipo, Integer> equipo:fichajesCaidosPorEquipo.entrySet()){
             if(equipo.getValue()>3){
                 for(Fichaje fichaje:historiaFichaje){
                     if(fichaje.getClub().equals(equipo.getKey())){
-                        String consulta="{call verificarFichaje(?,?)};";
+                        String consulta="{call verificarFichaje(?,?,?)};";
                         try{
                             CallableStatement sentenciaSQL = accesoBase.getConexion().prepareCall(consulta);
                             sentenciaSQL.setInt(1,fichaje.getIdFichaje());
                             sentenciaSQL.registerOutParameter(2, Types.NVARCHAR);
 
-
                             boolean hadResults =  sentenciaSQL.execute();
-
                             //
                             // Process all returned result sets
                             //
-
                             while (hadResults) { //si es false, no hizo nada, sino si
                                 ResultSet rs = sentenciaSQL.getResultSet();
 
+                                while(rs.next()){
+                                    String error = rs.getString(2);
+                                    String correccion = rs.getString(3);
+                                    System.out.println("Error: " + error);
+                                    System.out.println("Correcciones: " + correccion);
+                                }
+
                                 // process result set
                                 hadResults = sentenciaSQL.getMoreResults();
+
                             }
 
                         }
@@ -494,7 +461,6 @@ public class Sistema {
             }
         }
     }
-// Preguntar lo de si esta bien llamado el procedure
 
     public static void main(String[] args) {
         Sistema s1= new Sistema();
@@ -507,26 +473,40 @@ public class Sistema {
             s1.traerFichajes();//Despues Fichajes
             s1.llenarDorsales();//Despues los Dorsales
             //Si no se pone en este Orden no funciona
-//            s1.jugadoresPorClubPorPosicion();
-//            s1.jugadorMasJovenFichado();
-//            System.out.println(s1.jugadorMasJovenFichado2().getDni());
-//            System.out.println(s1.jugadorMasJovenFichado2().getNombre());
-//            s1.fichajeCaidoPorPosicion();
-//            s1.jugadorMalRepresentado();
-//            s1.managerRepetidoEnClub();
-//            s1.managerRepetidoEnClub2();
-//            s1.clubProhibidoMasRecurrente();
-//            s1.mejorPagoPorPosicion();
-//            HashMap<Posicion, Jugador>hash = s1.mejorPagoPorPosicion2();
-//            for(Map.Entry<Posicion,Jugador>entry : hash.entrySet()){
-//                System.out.println("Posicion: " + entry.getKey() + ": Jugador: " + entry.getValue().getSalario());
-//            }
+            System.out.println();
+            s1.jugadoresPorClubPorPosicion();
+            System.out.println();
+            s1.jugadorMasJovenFichado();
+            System.out.println();
+            System.out.println("EJERCICIO B (version 2)");
+            System.out.println("Jugador más joven en ser fichado por un club.");
+            System.out.println(s1.jugadorMasJovenFichado2().getDni());
+            System.out.println(s1.jugadorMasJovenFichado2().getNombre());
+            System.out.println();
+            s1.fichajeCaidoPorPosicion();
+            System.out.println();
+            s1.jugadorMalRepresentado();
+            System.out.println();
+            s1.managerRepetidoEnClub();
+            s1.managerRepetidoEnClub2();
+            System.out.println();
+            s1.clubProhibidoMasRecurrente();
+            HashMap<Posicion, Jugador>hash = s1.mejorPagoPorPosicion();
+            for(Map.Entry<Posicion,Jugador>entry : hash.entrySet()){
+                System.out.println("Posicion: " + entry.getKey() + ": Jugador: " + entry.getValue().getSalario());
+            }
+            System.out.println();
+            System.out.println();
+            HashMap<Posicion, Jugador>hash2 = s1.mejorPagoPorPosicion2();
+            for(Map.Entry<Posicion,Jugador>entry : hash2.entrySet()){
+                System.out.println("Posicion: " + entry.getKey() + ": Jugador: " + entry.getValue().getSalario());
+            }
+            System.out.println();
             s1.correccionFichaje2();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
     }
 }
-
 // Los metodos que tienen el nombre y un 2 al final son las versiones en java del ejercicio.
 // No borramos la version vieja (hecha con sql) pq nos dijo tincho que no lo hagamos.
