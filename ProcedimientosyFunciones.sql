@@ -27,17 +27,18 @@ INSERT INTO `PoliPases`.`Representante_has_Equipo` (`Representante_DNI`, `Equipo
 (87654321, 2, 1),
 (12345678, 3, 0),
 (12345678, 2, 0);
-INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje`, `Equipo_id`, `Jugador_id`) VALUES
-(1, '10', '2023-06-01 10:00:00', 1,11111111),
-(2, '7', '2023-06-02 15:30:00', 2,22222222),
-(3, '5', '2023-06-03 12:45:00', 3,33333333),
-(4, '20', '2023-06-02 15:30:00', 1,11111112),
-(5, 13, '2023-06-02 15:30:00', 2, 11111112),
-(6, 13, '2023-06-02 15:30:00', 2, 11111112),
-(7, 24, '2023-06-02 15:30:00', 2, 11111111),
-(8, 10, '2023-06-02 15:30:00', 1, 22222222),
-(9, 10, '2023-06-02 15:30:00', 1, 33333333),
-(10, 10, '2023-06-02 15:30:00', 1, 33333333);
+INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje`, `Equipo_id`, `Jugador_id`,`completado`) VALUES
+(1, '10', '2023-06-01 10:00:00', 1,11111111,1),
+(2, '7', '2023-06-02 15:30:00', 2,22222222,1),
+(3, '5', '2023-06-03 12:45:00', 3,33333333,0),
+(4, '20', '2023-06-02 15:30:00', 1,11111112,1),
+(5, 13, '2023-06-02 15:30:00', 2, 11111112,0),
+(6, 13, '2023-06-02 15:30:00', 2, 11111112,0),
+(7, 24, '2023-06-02 15:30:00', 2, 11111111,0),
+(8, 10, '2023-06-02 15:30:00', 1, 22222222,0),
+(9, 10, '2023-06-02 15:30:00', 1, 33333333,0),
+(10, 10, '2023-06-02 15:30:00', 1, 33333333,0),
+(11, 10, '2023-06-02 15:30:00', 1, 22222222,0);
 
 #a Procedimiento que liste los jugadores por club.
 drop view if exists jugadoresPorClub;
@@ -142,14 +143,14 @@ create function verificarManager (idDeFichaje int)
 returns boolean 
 deterministic
 begin 
-	declare verificacion boolean default false;
+	declare verificacion boolean default true;
 	declare idEquipoFichaje int;
     declare idRepresentante int;
     select Equipo_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje;
-    select Representante_DNI into idRepresentante from Jugador where DNI = (select Jugador_id from Fichaje where idFichaje = idDeFichaje);
-    if (select Representante_habilitado from Representante_has_Equipo where Equipo_idEquipo=idEquipoFichaje and Representante_DNI = idRepresentante) = 1
+    select Representante_DNI into idRepresentante from Jugador where DNI = (select Jugador_id from Fichaje where idFichaje = idDeFichaje) limit 1;
+    if (select Representante_habilitado from Representante_has_Equipo where Equipo_idEquipo=idEquipoFichaje and Representante_DNI = idRepresentante) = 0
 		then 
-        set verificacion = true;
+        set verificacion = false;
 	end if;
     return verificacion;
 end //
@@ -214,12 +215,14 @@ delimiter ;
 delimiter //
 
 drop procedure if exists verificarFichaje//
-create procedure verificarFichaje(IN idDeFichaje INT, OUT errorPosicion VARCHAR(100), OUT correccion VARCHAR(100))
+create procedure verificarFichaje(IN idDeFichaje INT, OUT errorPosicion VARCHAR(200), OUT correccion VARCHAR(200))
 begin
 	declare numeroCamiseta int default 1;
     declare representanteValido int;
+    set errorPosicion = "";
+    set correccion = "";
 	if verificarManager(idDeFichaje) = false then
-		set errorPosicion = "El manager no esta habilitado para ese club";
+		set errorPosicion = concat(errorPosicion, " El manager no esta habilitado para ese club");
 		set correccion = concat(correccion, " Manager: de ", (select Representante_DNI from Jugador where DNI = (select Jugador_id from Fichaje where idFichaje = idDeFichaje)), " a ");
     #Le asigna un representante que tenga en el equipo 
 		select Representante_DNI into representanteValido from Representante_has_Equipo where Representante_habilitado = true 
@@ -228,7 +231,7 @@ begin
         update Jugador set Representante_DNI = representanteValido where DNI = (select Jugador_id from Fichaje where idFichaje = idDeFichaje);
 	end if;
 	IF  verificarCamiseta(idDeFichaje) = false then
-		set errorPosicion =  "Camiseta repetida";
+		set errorPosicion =  concat(errorPosicion, " Camiseta repetida");
 		set correccion = concat(correccion, " Camiseta: de ", (select numCamiseta from Fichaje where idFichaje = idDeFichaje limit 1), " a ");
 		#Le asigna el primer numero de camiseta que este disponible empezando del 1
 		cambiarNumero : LOOP
@@ -242,23 +245,12 @@ begin
         end loop;
 	end if;
     if verificarPosicion(idDeFichaje) = false then
-		set errorPosicion = " No puede haber tantos jugadores en esa posicion";
+		set errorPosicion = concat(errorPosicion, " No puede haber tantos jugadores en esa posicion");
 	end if;
+    if verificarPosicion(idDeFichaje) = false and  verificarCamiseta(idDeFichaje) = false and verificarManager(idDeFichaje) = false then
+		update Fichaje set completado = true where idFichaje = idDeFichaje;
+    end if;
 end//
 
 delimiter ; 
-
-<<<<<<< HEAD
-call verificarFichaje(6,@error,@correcion);
-select @error,@correcion;
 select * from Fichaje;
-select * from Jugador;
-=======
-call verificarFichaje(9,@variable);
-call verificarFichaje(8,@variable);
-call verificarFichaje(10,@variable);
-select * FROM Fichaje;
-update Fichaje set numCamiseta=10 where idFichaje=10 or idFichaje=9 or idFichaje=8;
-
-
->>>>>>> origin/main

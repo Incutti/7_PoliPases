@@ -57,7 +57,7 @@ public class Sistema {
 
 
     public void traerFichajes(){
-        String consulta = "select nombreJugador,apellidoJugador,fechaNacimiento,salario,upper(rol),Representante_DNI,Posicion_idPosicion,idFichaje,numCamiseta,fechaHoraFichaje,Equipo_id,Jugador_id from Fichaje join Jugador on Fichaje.Jugador_id = Jugador.DNI join Posicion on Jugador.Posicion_idPosicion=Posicion.id;";
+        String consulta = "select nombreJugador,apellidoJugador,fechaNacimiento,salario,upper(rol),Representante_DNI,Posicion_idPosicion,idFichaje,numCamiseta,fechaHoraFichaje,Equipo_id,Jugador_id,completado from Fichaje join Jugador on Fichaje.Jugador_id = Jugador.DNI join Posicion on Jugador.Posicion_idPosicion=Posicion.id;";
         Representante managerJugador = new Representante();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         try {
@@ -81,7 +81,7 @@ public class Sistema {
                         fichajeNuevo.setClub(e);
                     }
                 }
-                /* falta poner el booleano de completo o no, podriamos ponerlo en la base o no c*/
+                fichajeNuevo.setCompletado(data.getBoolean("completado"));
                 historiaFichaje.add(fichajeNuevo);
             }
         } catch (SQLException ex) {
@@ -425,30 +425,26 @@ public class Sistema {
         for(Map.Entry<Equipo, Integer> equipo:fichajesCaidosPorEquipo.entrySet()){
             if(equipo.getValue()>3){
                 for(Fichaje fichaje:historiaFichaje){
-                    if(fichaje.getClub().equals(equipo.getKey())){
+                    if(fichaje.getClub().equals(equipo.getKey()) && !fichaje.isCompletado()){
                         String consulta="{call verificarFichaje(?,?,?)};";
                         try{
                             CallableStatement sentenciaSQL = accesoBase.getConexion().prepareCall(consulta);
                             sentenciaSQL.setInt(1,fichaje.getIdFichaje());
                             sentenciaSQL.registerOutParameter(2, Types.NVARCHAR);
+                            sentenciaSQL.registerOutParameter(3, Types.NVARCHAR);
 
-                            boolean hadResults =  sentenciaSQL.execute();
+                            sentenciaSQL.execute();
                             //
                             // Process all returned result sets
                             //
-                            while (hadResults) { //si es false, no hizo nada, sino si
-                                ResultSet rs = sentenciaSQL.getResultSet();
-
-                                while(rs.next()){
-                                    String error = rs.getString(2);
-                                    String correccion = rs.getString(3);
-                                    System.out.println("Error: " + error);
-                                    System.out.println("Correcciones: " + correccion);
-                                }
-
-                                // process result set
-                                hadResults = sentenciaSQL.getMoreResults();
-
+                            String error = sentenciaSQL.getString(2);
+                            if (!error.equals("")) {
+                                System.out.println("Id: " + fichaje.getIdFichaje());
+                                System.out.println("Error: " + error);
+                            }
+                            String correccion = sentenciaSQL.getString(3);
+                            if(!correccion.equals("")){
+                                System.out.println("Correcciones: " + correccion);
                             }
 
                         }
@@ -503,6 +499,14 @@ public class Sistema {
             }
             System.out.println();
             s1.correccionFichaje2();
+            //Update en java de lo cambiado en correccionFichaje2()
+            s1.historiaFichaje = new HashSet<>();
+            s1.listaEquipos = new HashSet<>();
+            s1.listaManager = new HashSet<>();
+            s1.traerEquipos();
+            s1.traerRepresentante();
+            s1.traerFichajes();
+            s1.llenarDorsales();
         } catch (SQLException ex) {
             System.out.println(ex);
         }

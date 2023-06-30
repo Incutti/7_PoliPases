@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS `PoliPases`.`Fichaje` (
   `fechaHoraFichaje` DATETIME NULL DEFAULT NULL,
   `Equipo_id` INT NOT NULL,
   `Jugador_id` INT NOT NULL,
+  `completado` boolean NOT NULL,
   PRIMARY KEY (`idFichaje`),
   INDEX `fk_Fichaje_Equipo1_idx` (`Equipo_id` ASC) VISIBLE,
   INDEX `fk_Fichaje_Jugador1_idx` (`Jugador_id` ASC) VISIBLE,
