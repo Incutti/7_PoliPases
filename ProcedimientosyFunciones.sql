@@ -253,4 +253,3 @@ begin
 end//
 
 delimiter ; 
-select * from Fichaje;
