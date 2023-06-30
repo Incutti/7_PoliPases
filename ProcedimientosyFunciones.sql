@@ -6,7 +6,7 @@ INSERT INTO `PoliPases`.`Equipo` (`idEquipo`, `nombreEquipo`) VALUES
 (3, 'Equipo C');
 INSERT INTO `PoliPases`.`Posicion` (`id`, `rol`) VALUES
 (1, 'Delantero'),
-(2, 'Mediocampista'),
+(2, 'Centrocampista'),
 (3, 'Defensa');
 INSERT INTO `PoliPases`.`Equipo_has_Posicion` (`Equipo_id`, `idPosicion`, `cantidadPermitida`) VALUES
 (1, 1, 3),
@@ -35,8 +35,8 @@ INSERT INTO `PoliPases`.`Fichaje` (`idFichaje`, `numCamiseta`, `fechaHoraFichaje
 (5, 13, '2023-06-02 15:30:00', 2, 11111112),
 (6, 13, '2023-06-02 15:30:00', 2, 11111112),
 (7, 24, '2023-06-02 15:30:00', 2, 11111111);
-#a Procedimiento que liste los jugadores por club.
 
+#a Procedimiento que liste los jugadores por club.
 drop view if exists jugadoresPorClub;
 create view jugadoresPorClub as
 select Equipo.nombreEquipo, Jugador.nombreJugador, Jugador.apellidoJugador, Posicion.rol from Jugador 
@@ -45,10 +45,9 @@ join Equipo on Fichaje.Equipo_id = Equipo.idEquipo
 join Posicion on Posicion_idPosicion=Posicion.id;
 select * from jugadoresPorClub;
 select * from Equipo;
+
 #b Función que, dada una posición y un club, retorne la cantidad de jugadores convocados para esa posición.
-
 delimiter // 
-
 drop function if exists cantJugadoresPorPosicion//
 create function cantJugadoresPorPosicion(posicionP int, idclub int)
 returns INT
@@ -63,11 +62,9 @@ begin
 end//
 delimiter ;
 select cantJugadoresPorPosicion(1,1) as cantJugadoresPorPosicion;
+
 #c.Función que dado un manager y un club retorne la cantidad de jugadores que representa.
-
-
 delimiter // 
-
 drop function if exists jugadoresManagerClub//
 create function jugadoresManagerClub(idManager int, club int)
 returns INT
@@ -86,9 +83,7 @@ delimiter ;
 select jugadoresManagerClub(12345678,1) as jugadoresManagerClub;
 
 #d. Procedimiento que retorne en parámetros de salida los datos del jugador mejor pago.
-
 delimiter //
-
 drop procedure if exists salarioMayor//
 create procedure salarioMayor(OUT mayorSalario varchar(1000))
 begin
@@ -117,7 +112,6 @@ call salarioMayor(@mayorSalario);
 select @mayorSalario;
 
 #e.Función que, dada una posición, devuelva el nombre del club con más jugadores de esa posición.
-
 delimiter //
 drop function if exists clubMasJugadores//
 create function clubMasJugadores(posicionId int)
@@ -139,7 +133,6 @@ select clubMasJugadores(3) as clubMasJugadores;
 #f.Procedimiento que, dado un fichaje, lo revise y solucione.
 #la idea es crear 3 funciones uno q verifique si el manager tienen hablitado el equipo, otro que se fije si el jugador tiene un numero de camiseta que ya esta en el equipo y otro que verifique si la posicion del jugador no excede el maximo de posiciones en el equipo.
 # cree un procedimiento que verifique si el manager tiene habilitado el equipo al cual el jugador tiene que ser fichado 
-
 delimiter //
 drop function if exists verificarManager//
 create function verificarManager (idDeFichaje int)
@@ -150,7 +143,7 @@ begin
 	declare idEquipoFichaje int;
     declare idRepresentante int;
     select Equipo_id from Fichaje where idFichaje=idDeFichaje into idEquipoFichaje;
-    select Representante_DNI into idRepresentante from Jugador where DNI = (select Jugador_id from fichaje where idFichaje = idDeFichaje);
+    select Representante_DNI into idRepresentante from Jugador where DNI = (select Jugador_id from Fichaje where idFichaje = idDeFichaje);
     if (select Representante_habilitado from Representante_has_Equipo where Equipo_idEquipo=idEquipoFichaje and Representante_DNI = idRepresentante) = 1
 		then 
         set verificacion = true;
@@ -158,6 +151,7 @@ begin
     return verificacion;
 end //
 delimiter ;
+
 
 delimiter //
 drop function if exists verificarPosicion//
@@ -242,3 +236,5 @@ begin
 end//
 
 delimiter ; 
+
+
