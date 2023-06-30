@@ -1,3 +1,4 @@
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -330,7 +331,7 @@ public class Sistema {
         }
         System.out.println("Ejercicio E");
         for(Representante r: managersRepetidos){
-            System.out.println(r.toString());
+            System.out.println("Nombre: " + r.getNombre() + " Apellido: " + r.getApellido() + " Dni: " + r.getDni() + " Fecha de Nacimiento: " + r.getFechaNacimiento());
         }
         return managersRepetidos;
     }
@@ -405,46 +406,6 @@ public class Sistema {
     }
 
 
-    public void correccionFichaje2(){
-        System.out.println("EJERCICIO H");
-        HashMap <Equipo, Integer> fichajesCaidosPorEquipo=new HashMap<>();
-        for(Fichaje fichaje:historiaFichaje){
-            if(!fichaje.isCompletado()){
-//                if(fichajesCaidosPorEquipo.size()==0){
-//                    fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
-//
-//                } else{
-//                    if(fichajesCaidosPorEquipo.get(fichaje.getClub()) == (null)){
-//                        fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
-//
-//                    }else{
-                fichajesCaidosPorEquipo.put(fichaje.getClub(),(fichajesCaidosPorEquipo.get(fichaje.getClub()) == null )? 1:fichajesCaidosPorEquipo.get(fichaje.getClub()) +1);
-//                  Esta linea ^ reemplaza lo comentado
-//                }}
-            }
-        }
-        for(Map.Entry<Equipo, Integer> equipo:fichajesCaidosPorEquipo.entrySet()){
-            if(equipo.getValue()>3){
-                for(Fichaje fichaje:historiaFichaje){
-                    if(fichaje.getClub().equals(equipo)){
-                        String consulta="{call verificarFichaje(?,?))};";
-                        try{
-                            ResultSet data;
-                            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareCall(consulta);
-                            sentenciaSQL.setInt(1,fichaje.getIdFichaje());
-                            data = sentenciaSQL.executeQuery(consulta);
-                            
-                        }
-                        catch(SQLException ex) {
-                            ex.printStackTrace();
-                        }
-
-                    }
-                }
-            }
-        }
-    }
-
 
     public void correccionFichaje(){
         System.out.println("EJERCICIO H");
@@ -483,6 +444,48 @@ public class Sistema {
             }
         }
     }
+
+    public void correccionFichaje2(){
+        System.out.println("EJERCICIO H");
+        HashMap <Equipo, Integer> fichajesCaidosPorEquipo=new HashMap<>();
+        for(Fichaje fichaje:historiaFichaje){
+            if(!fichaje.isCompletado()){
+//                if(fichajesCaidosPorEquipo.size()==0){
+//                    fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
+//
+//                } else{
+//                    if(fichajesCaidosPorEquipo.get(fichaje.getClub()) == (null)){
+//                        fichajesCaidosPorEquipo.put(fichaje.getClub(),1);
+//
+//                    }else{
+                fichajesCaidosPorEquipo.put(fichaje.getClub(),(fichajesCaidosPorEquipo.get(fichaje.getClub()) == null )? 1:fichajesCaidosPorEquipo.get(fichaje.getClub()) +1);
+//                  Esta linea ^ reemplaza lo comentado
+//                }}
+            }
+        }
+        for(Map.Entry<Equipo, Integer> equipo:fichajesCaidosPorEquipo.entrySet()){
+            if(equipo.getValue()>3){
+                for(Fichaje fichaje:historiaFichaje){
+                    if(fichaje.getClub().equals(equipo)){
+                        String consulta="{call verificarFichaje(?,?))};";
+                        try{
+                            ResultSet data;
+                            CallableStatement sentenciaSQL = accesoBase.getConexion().prepareCall(consulta);
+                            sentenciaSQL.setInt(1,fichaje.getIdFichaje());
+                            sentenciaSQL.setInt(2,fichaje.getIdFichaje());
+
+                            data = sentenciaSQL.executeQuery(consulta);
+
+                        }
+                        catch(SQLException ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+                }
+            }
+        }
+    }
 // Preguntar lo de si esta bien llamado el procedure
 
     public static void main(String[] args) {
@@ -503,7 +506,7 @@ public class Sistema {
 //            s1.fichajeCaidoPorPosicion();
 //            s1.jugadorMalRepresentado();
 //            s1.managerRepetidoEnClub();
-//*            s1.managerRepetidoEnClub2();
+//            s1.managerRepetidoEnClub2();
 //            s1.clubProhibidoMasRecurrente();
 //            s1.mejorPagoPorPosicion();
 //            HashMap<Posicion, Jugador>hash = s1.mejorPagoPorPosicion2();
