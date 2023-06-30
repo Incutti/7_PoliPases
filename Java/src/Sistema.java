@@ -1,7 +1,4 @@
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -335,7 +332,7 @@ public class Sistema {
         }
         return managersRepetidos;
     }
-//  devuelve muchos datos inutiles
+
 
     public HashMap<Posicion, Jugador> mejorPagoPorPosicion(){
         HashMap<Posicion, Jugador>hash = new HashMap<>();
@@ -466,15 +463,26 @@ public class Sistema {
         for(Map.Entry<Equipo, Integer> equipo:fichajesCaidosPorEquipo.entrySet()){
             if(equipo.getValue()>3){
                 for(Fichaje fichaje:historiaFichaje){
-                    if(fichaje.getClub().equals(equipo)){
-                        String consulta="{call verificarFichaje(?,?))};";
+                    if(fichaje.getClub().equals(equipo.getKey())){
+                        String consulta="{call verificarFichaje(?,?)};";
                         try{
-                            ResultSet data;
                             CallableStatement sentenciaSQL = accesoBase.getConexion().prepareCall(consulta);
                             sentenciaSQL.setInt(1,fichaje.getIdFichaje());
-                            sentenciaSQL.setInt(2,fichaje.getIdFichaje());
+                            sentenciaSQL.registerOutParameter(2, Types.NVARCHAR);
 
-                            data = sentenciaSQL.executeQuery(consulta);
+
+                            boolean hadResults =  sentenciaSQL.execute();
+
+                            //
+                            // Process all returned result sets
+                            //
+
+                            while (hadResults) { //si es false, no hizo nada, sino si
+                                ResultSet rs = sentenciaSQL.getResultSet();
+
+                                // process result set
+                                hadResults = sentenciaSQL.getMoreResults();
+                            }
 
                         }
                         catch(SQLException ex) {
@@ -513,7 +521,7 @@ public class Sistema {
 //            for(Map.Entry<Posicion,Jugador>entry : hash.entrySet()){
 //                System.out.println("Posicion: " + entry.getKey() + ": Jugador: " + entry.getValue().getSalario());
 //            }
-//*            s1.correccionFichaje();
+            s1.correccionFichaje2();
         } catch (SQLException ex) {
             System.out.println(ex);
         }
