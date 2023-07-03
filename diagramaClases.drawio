@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-06-28T19:57:17.603Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="2I9-jF1flruEBC3R-aum" version="21.5.2" type="device">
+<mxfile host="app.diagrams.net" modified="2023-07-03T11:52:16.565Z" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/114.0" etag="6uGrbYGPphprMkoEHHWx" version="21.5.2" type="device">
   <diagram name="Página-1" id="Us4SUqFYmus3Z6xAyAEw">
-    <mxGraphModel dx="2140" dy="676" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1528" dy="420" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -49,14 +49,14 @@
         <mxCell id="C6rFniiPkEbHIxD3JTWG-27" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="C6rFniiPkEbHIxD3JTWG-24" vertex="1">
           <mxGeometry y="98" width="290" height="2" as="geometry" />
         </mxCell>
-        <mxCell id="C6rFniiPkEbHIxD3JTWG-29" value="&amp;lt;Enumeracion&amp;gt;&lt;br&gt;Posicion" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="400" y="40" width="160" height="118" as="geometry" />
+        <mxCell id="C6rFniiPkEbHIxD3JTWG-29" value="Posicion" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="400" y="40" width="160" height="108" as="geometry" />
         </mxCell>
         <mxCell id="C6rFniiPkEbHIxD3JTWG-30" value="&lt;div&gt;-&amp;nbsp;DELANTERO&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#ffffff&quot;&gt;-&amp;nbsp;&lt;span style=&quot;font-style: italic;&quot;&gt;MEDIOCAMPISTA&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#ffffff&quot;&gt;-&amp;nbsp;&lt;span style=&quot;font-style: italic;&quot;&gt;DEFENSA&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font color=&quot;#ffffff&quot;&gt;-&amp;nbsp;&lt;span style=&quot;font-style: italic;&quot;&gt;ARQUERO&lt;/span&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="C6rFniiPkEbHIxD3JTWG-29" vertex="1">
-          <mxGeometry y="40" width="160" height="70" as="geometry" />
+          <mxGeometry y="30" width="160" height="70" as="geometry" />
         </mxCell>
         <mxCell id="C6rFniiPkEbHIxD3JTWG-31" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="C6rFniiPkEbHIxD3JTWG-29" vertex="1">
-          <mxGeometry y="110" width="160" height="8" as="geometry" />
+          <mxGeometry y="100" width="160" height="8" as="geometry" />
         </mxCell>
         <mxCell id="C6rFniiPkEbHIxD3JTWG-64" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" parent="1" source="C6rFniiPkEbHIxD3JTWG-33" target="C6rFniiPkEbHIxD3JTWG-56" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -108,20 +108,23 @@
         <mxCell id="C6rFniiPkEbHIxD3JTWG-65" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.832;exitY=1;exitDx=0;exitDy=0;entryX=1.015;entryY=0.339;entryDx=0;entryDy=0;entryPerimeter=0;exitPerimeter=0;" parent="1" source="C6rFniiPkEbHIxD3JTWG-27" target="C6rFniiPkEbHIxD3JTWG-57" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="3wW6Hd09rNyCNh4YiieY-1" value="AccesoBAseDeDatos" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+        <mxCell id="3wW6Hd09rNyCNh4YiieY-1" value="AccesoBAseDeDatos" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-460" y="420" width="360" height="300" as="geometry" />
         </mxCell>
-        <mxCell id="3wW6Hd09rNyCNh4YiieY-2" value="- conexion: Connection&lt;br&gt;- nombreBaseDeDatos: String&lt;br&gt;- noimbreTabla: List&amp;lt;String&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="3wW6Hd09rNyCNh4YiieY-1">
+        <mxCell id="3wW6Hd09rNyCNh4YiieY-2" value="- conexion: Connection&lt;br&gt;- nombreBaseDeDatos: String&lt;br&gt;- noimbreTabla: List&amp;lt;String&amp;gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="3wW6Hd09rNyCNh4YiieY-1" vertex="1">
           <mxGeometry y="26" width="360" height="84" as="geometry" />
         </mxCell>
-        <mxCell id="3wW6Hd09rNyCNh4YiieY-3" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" vertex="1" parent="3wW6Hd09rNyCNh4YiieY-1">
+        <mxCell id="3wW6Hd09rNyCNh4YiieY-3" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="3wW6Hd09rNyCNh4YiieY-1" vertex="1">
           <mxGeometry y="110" width="360" height="8" as="geometry" />
         </mxCell>
-        <mxCell id="3wW6Hd09rNyCNh4YiieY-4" value="&lt;div&gt;+ conectar(String, String): void&lt;/div&gt;&lt;div&gt;+ almacenarDatos(Object): HashMap&amp;lt;String, Object&amp;gt;&lt;/div&gt;&lt;div&gt;+ obtenerColumnasDeUnaTabla(ArrayList&amp;lt;String&amp;gt;): String&amp;nbsp;&lt;/div&gt;&lt;div&gt;+ obtenerId(String, String, Object): int&lt;/div&gt;&lt;div&gt;+ obtenerSelectConMasDeUnValor(String, String, String, Object): ArryList&amp;lt;String&amp;gt;&lt;/div&gt;&lt;div&gt;+ ifExists(String, String, Object): boolean&lt;/div&gt;&lt;div&gt;+ obtenerValorDeUnCampo(String, String, int): String&amp;nbsp;&lt;/div&gt;&lt;div&gt;+ actualizarVecesSolicitadas(String, String, int): void&lt;/div&gt;&lt;div&gt;+ actualizarEstado(String, String, int): void&lt;/div&gt;&lt;div&gt;+ obtenerValorMaximo(String, String): int&lt;/div&gt;&lt;div&gt;+ ingresarDatos(HasMap&amp;lt;String, Object&amp;gt;, String): void&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="3wW6Hd09rNyCNh4YiieY-1">
+        <mxCell id="3wW6Hd09rNyCNh4YiieY-4" value="&lt;div&gt;+ conectar(String, String): void&lt;/div&gt;&lt;div&gt;+ almacenarDatos(Object): HashMap&amp;lt;String, Object&amp;gt;&lt;/div&gt;&lt;div&gt;+ obtenerColumnasDeUnaTabla(ArrayList&amp;lt;String&amp;gt;): String&amp;nbsp;&lt;/div&gt;&lt;div&gt;+ obtenerId(String, String, Object): int&lt;/div&gt;&lt;div&gt;+ obtenerSelectConMasDeUnValor(String, String, String, Object): ArryList&amp;lt;String&amp;gt;&lt;/div&gt;&lt;div&gt;+ ifExists(String, String, Object): boolean&lt;/div&gt;&lt;div&gt;+ obtenerValorDeUnCampo(String, String, int): String&amp;nbsp;&lt;/div&gt;&lt;div&gt;+ actualizarVecesSolicitadas(String, String, int): void&lt;/div&gt;&lt;div&gt;+ actualizarEstado(String, String, int): void&lt;/div&gt;&lt;div&gt;+ obtenerValorMaximo(String, String): int&lt;/div&gt;&lt;div&gt;+ ingresarDatos(HasMap&amp;lt;String, Object&amp;gt;, String): void&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="3wW6Hd09rNyCNh4YiieY-1" vertex="1">
           <mxGeometry y="118" width="360" height="182" as="geometry" />
         </mxCell>
-        <mxCell id="3wW6Hd09rNyCNh4YiieY-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="3wW6Hd09rNyCNh4YiieY-2" target="C6rFniiPkEbHIxD3JTWG-57">
+        <mxCell id="3wW6Hd09rNyCNh4YiieY-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="3wW6Hd09rNyCNh4YiieY-2" target="C6rFniiPkEbHIxD3JTWG-57" edge="1">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="57tLa3oVAIQ6FWEUYhaM-1" value="&amp;lt;Enum&amp;gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="428" y="10" width="104" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
