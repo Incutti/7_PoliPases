@@ -201,7 +201,60 @@ public class Sistema {
         }
     }
 
-    public void 
+    public void traerRepresentante2(HashMap<Integer,HashMap<String,Object>>datos){
+        ArrayList<String>columnas = accesoBase.obtenerColumnasDeUnaTabla("Representante");
+        for(Map.Entry<Integer, HashMap<String,Object>>d : datos.entrySet()){
+            Representante representante = new Representante();
+            representante.setDni(d.getKey());
+            for(Map.Entry<String,Object>entry : d.getValue().entrySet()){
+                if(entry.getKey().equals(columnas.get(1))){
+                    String s = (String) entry.getValue();
+                    representante.setNombre(s);
+                }
+                if(entry.getKey().equals(columnas.get(2))){
+                    String s = (String) entry.getValue();
+                    representante.setApellido(s);
+                }
+                if(entry.getKey().equals(columnas.get(3))){
+                    LocalDate l= (LocalDate) entry.getValue();
+                    representante.setFechaNacimiento(l);
+                }
+                if(entry.getKey().equals("EquiposProhibido")){
+                    HashSet<Equipo>equipos = new HashSet<>();
+                    for (Integer i : (Integer[]) entry.getValue()){
+                        for(Equipo e : listaEquipos){
+                            if(e.getId() == i){
+                                equipos.add(e);
+                            }
+                        }
+                    }
+                    representante.setClubesProhibidos(equipos);
+                }
+                if(entry.getKey().equals("EquiposContactados")){
+                    HashSet<Equipo>equipos = new HashSet<>();
+                    for (Integer i : (Integer[]) entry.getValue()){
+                        for(Equipo e : listaEquipos){
+                            if(e.getId() == i){
+                                equipos.add(e);
+                            }
+                        }
+                    }
+                    representante.setClubesProhibidos(equipos);
+                }
+                if(entry.getKey().equals("Jugadores")){
+                    HashSet<Jugador>jugadores = new HashSet<>();
+                    for (Map.Entry<Integer, HashMap<String, Object>> hashMapEntry: (HashMap<Integer, HashMap<String, Object>>) entry.getValue().entrySet()){
+                        for(Equipo e : listaEquipos){
+                            if(e.getId() == i){
+                                equipos.add(e);
+                            }
+                        }
+                    }
+                    representante.setClubesProhibidos(equipos);
+                }
+            }
+        }
+    }
 
     public void jugadoresPorClubPorPosicion() {
         String consulta = "SELECT *,upper(rol) FROM jugadoresPorClub;";
