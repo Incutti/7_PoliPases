@@ -1,3 +1,5 @@
+import com.sun.org.apache.xpath.internal.operations.Neg;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -117,6 +119,25 @@ public class Sistema {
         }
     }
 
+    public void traerEquipo2(HashMap<Integer,HashMap<String,Object>>datos){
+        ArrayList<String>columnas = accesoBase.obtenerColumnasDeUnaTabla("Equipo");
+        for(Map.Entry<Integer,HashMap<String,Object>>d : datos.entrySet()){
+            Equipo equipo = new Equipo();
+            equipo.setId(d.getKey());
+            for(Map.Entry<String, Object>entry : d.getValue().entrySet()){
+                if(entry.getKey().equals(columnas.get(1))) {
+                    String s = (String)entry.getValue();
+                    equipo.setNombre(s);
+                }
+                if(entry.getKey().equals("cantPermitidaPosicion")){
+                    HashMap<Posicion, Integer>hashMap = (HashMap<Posicion, Integer>)entry.getValue();
+                    equipo.setCantPermitidaPosicion(hashMap);
+                }
+            }
+            listaEquipos.add(equipo);
+        }
+    }
+
     public void llenarDorsales(){
         for(Fichaje f : historiaFichaje){
             HashMap<Integer, Jugador>dorsales =f.getClub().getDorsales();
@@ -180,8 +201,10 @@ public class Sistema {
         }
     }
 
+    public void 
+
     public void jugadoresPorClubPorPosicion() {
-        String consulta = "SELECT * FROM jugadoresPorClub;";
+        String consulta = "SELECT *,upper(rol) FROM jugadoresPorClub;";
         ArrayList<String> nombreCampos = new ArrayList<>();
         try {
             ResultSet data;
@@ -189,10 +212,10 @@ public class Sistema {
             data = sentenciaSQL.
                     executeQuery(consulta);
             while (data.next()) {
+                nombreCampos.add(data.getString("upper(rol)"));
                 nombreCampos.add(data.getString("nombreJugador"));
                 nombreCampos.add(data.getString("apellidoJugador"));
                 nombreCampos.add(data.getString("nombreEquipo"));
-                nombreCampos.add(data.getString("rol"));
                 nombreCampos.add("\n");
             }
         } catch (SQLException ex) {
@@ -200,8 +223,21 @@ public class Sistema {
         }
         System.out.println("EJERCICIO A");
         System.out.println("Listado de jugadores por posición por club.");
-        for(String campo:nombreCampos){
-            System.out.println(campo);
+        for(Posicion p:Posicion.values()) {
+            if(nombreCampos.contains(p.name())) {
+                System.out.println(p);
+            for(int i = 0; i<nombreCampos.size(); i++){
+                    if(nombreCampos.get(i).equals(p.name())) {
+                        i++;
+                        System.out.println(nombreCampos.get(i));
+                        i++;
+                        System.out.println(nombreCampos.get(i));
+                        i++;
+                        System.out.println(nombreCampos.get(i));
+                        System.out.println();
+                    }
+                }
+            }
         }
     }
 
@@ -465,7 +501,7 @@ public class Sistema {
         s1.accesoBase = new AccesoBaseDeDatos("PoliPases", s1.tablas);
         try {
             s1.accesoBase.conectar("alumno", "alumnoipm");
-            s1.traerEquipos();//Primero Clubes
+            s1.traerEquipo2(s1.accesoBase.traerEquipos());//Primero Clubes
             s1.traerRepresentante();//Despues Representantes
             s1.traerFichajes();//Despues Fichajes
             s1.llenarDorsales();//Despues los Dorsales
