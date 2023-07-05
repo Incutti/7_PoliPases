@@ -1,5 +1,6 @@
 import com.sun.org.apache.xpath.internal.operations.Neg;
 
+import java.awt.image.ImageProducer;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -88,6 +89,70 @@ public class Sistema {
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
+        }
+    }
+    public void traerFichajes2(HashMap<Integer,HashMap<String, Object>>datos){
+        ArrayList<String>columnas = accesoBase.obtenerColumnasDeUnaTabla("Fichaje");
+        ArrayList<String>columnasJugador = accesoBase.obtenerColumnasDeUnaTabla("Jugador");
+        ArrayList<String>columnasPosicion = accesoBase.obtenerColumnasDeUnaTabla("Posicion");
+        Representante managerJugador = new Representante();
+        Jugador jugador = new Jugador();
+        for(Map.Entry<Integer,HashMap<String, Object>>d : datos.entrySet()){
+            Fichaje fichaje = new Fichaje();
+            fichaje.setIdFichaje(d.getKey());
+            for(Map.Entry<String, Object>entry : d.getValue().entrySet()){
+                if (entry.getKey().equals(columnas.get(1))){
+                    Integer i = (Integer) entry.getValue();
+                    fichaje.setNumeroCamiseta(i);
+                }
+                if (entry.getKey().equals(columnas.get(2))) {
+                    LocalDateTime l = (LocalDateTime) entry.getValue();
+                    fichaje.setFechaHoraFichaje(l);
+                }
+                if (entry.getKey().equals(columnas.get(3))){
+                     for (Equipo e : listaEquipos){
+                         if (e.getId() == (Integer) entry.getValue()){
+                             fichaje.setClub(e);
+                         }
+                     }
+
+                }
+                if (entry.getKey().equals("Jugador")) {
+                    for(Map.Entry<String,Object>e : ((HashMap<String, Object>)entry.getValue()).entrySet()) {
+                        if(e.getKey().equals(columnasJugador.get(0))){
+                            int i = (int) e.getValue();
+                            jugador.setDni(i);
+                        }
+                        if (e.getKey().equals(columnasJugador.get(1))) {
+                            String s = (String) e.getValue();
+                            jugador.setNombre(s);
+                        }
+                        if (e.getKey().equals(columnasJugador.get(2))) {
+                            String s = (String) e.getValue();
+                            jugador.setApellido(s);
+                        }
+                        if (e.getKey().equals(columnasJugador.get(3))) {
+                            LocalDate l = (LocalDate) e.getValue();
+                            jugador.setFechaNacimiento(l);
+                        }
+                        if(e.getKey().equals(columnasJugador.get(4))) {
+                            float f = (float) e.getValue();
+                            jugador.setSalario(f);
+                        }
+                        if(e.getKey().equals(columnasPosicion.get(1))) {
+                            Posicion p = (Posicion) e.getValue();
+                            jugador.setPosicion(p);
+                        }
+                        if(e.getKey().equals(columnasJugador.get(5))) {
+                            for (Representante r : listaManager) {
+                                if (r.getDni() == (Integer) entry.getValue()) {
+                                    jugador.setRepresentante(r);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -203,6 +268,8 @@ public class Sistema {
 
     public void traerRepresentante2(HashMap<Integer,HashMap<String,Object>>datos){
         ArrayList<String>columnas = accesoBase.obtenerColumnasDeUnaTabla("Representante");
+        ArrayList<String>columnasJugador = accesoBase.obtenerColumnasDeUnaTabla("Jugador");
+        ArrayList<String>columnasPosicion = accesoBase.obtenerColumnasDeUnaTabla("Posicion");
         for(Map.Entry<Integer, HashMap<String,Object>>d : datos.entrySet()){
             Representante representante = new Representante();
             representante.setDni(d.getKey());
@@ -221,7 +288,7 @@ public class Sistema {
                 }
                 if(entry.getKey().equals("EquiposProhibido")){
                     HashSet<Equipo>equipos = new HashSet<>();
-                    for (Integer i : (Integer[]) entry.getValue()){
+                    for (Integer i : (HashSet<Integer>) entry.getValue()){
                         for(Equipo e : listaEquipos){
                             if(e.getId() == i){
                                 equipos.add(e);
@@ -232,27 +299,48 @@ public class Sistema {
                 }
                 if(entry.getKey().equals("EquiposContactados")){
                     HashSet<Equipo>equipos = new HashSet<>();
-                    for (Integer i : (Integer[]) entry.getValue()){
+                    for (Integer i : (HashSet<Integer>) entry.getValue()){
                         for(Equipo e : listaEquipos){
                             if(e.getId() == i){
                                 equipos.add(e);
                             }
                         }
                     }
-                    representante.setClubesProhibidos(equipos);
+                    representante.setClubesContactados(equipos);
                 }
                 if(entry.getKey().equals("Jugadores")){
                     HashSet<Jugador>jugadores = new HashSet<>();
-                    for (Map.Entry<Integer, HashMap<String, Object>> hashMapEntry: (HashMap<Integer, HashMap<String, Object>>) entry.getValue().entrySet()){
-                        for(Equipo e : listaEquipos){
-                            if(e.getId() == i){
-                                equipos.add(e);
+                    for (Map.Entry<Integer, HashMap<String, Object>> hashMapEntry: ((HashMap<Integer, HashMap<String, Object>>) entry.getValue()).entrySet()){
+                        Jugador jugador = new Jugador();
+                        jugador.setDni(hashMapEntry.getKey());
+                        for(Map.Entry<String,Object>e : hashMapEntry.getValue().entrySet()) {
+                            if (e.getKey().equals(columnasJugador.get(1))) {
+                                String s = (String) e.getValue();
+                                jugador.setNombre(s);
+                            }
+                            if (e.getKey().equals(columnasJugador.get(2))) {
+                                String s = (String) e.getValue();
+                                jugador.setApellido(s);
+                            }
+                            if (e.getKey().equals(columnasJugador.get(3))) {
+                                LocalDate l = (LocalDate) e.getValue();
+                                jugador.setFechaNacimiento(l);
+                            }
+                            if(e.getKey().equals(columnasJugador.get(4))) {
+                                float f = (float) e.getValue();
+                                jugador.setSalario(f);
+                            }
+                            if(e.getKey().equals(columnasPosicion.get(1))) {
+                                Posicion p = (Posicion) e.getValue();
+                                jugador.setPosicion(p);
                             }
                         }
+                        jugadores.add(jugador);
                     }
-                    representante.setClubesProhibidos(equipos);
+                    representante.setJugadoresRepresentados(jugadores);
                 }
             }
+            listaManager.add(representante);
         }
     }
 
@@ -555,7 +643,7 @@ public class Sistema {
         try {
             s1.accesoBase.conectar("alumno", "alumnoipm");
             s1.traerEquipo2(s1.accesoBase.traerEquipos());//Primero Clubes
-            s1.traerRepresentante();//Despues Representantes
+            s1.traerRepresentante2(s1.accesoBase.traerRepresentante());//Despues Representantes
             s1.traerFichajes();//Despues Fichajes
             s1.llenarDorsales();//Despues los Dorsales
             //Si no se pone en este Orden no funciona

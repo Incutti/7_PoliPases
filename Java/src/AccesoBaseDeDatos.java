@@ -283,16 +283,16 @@ public class AccesoBaseDeDatos {
                 HashMap<String, Object> auxiliar=new HashMap<>();
 //              Representante representante=new Representante();
 //              representante.setDni(data.getInt("dniRepresentante"));
+                auxiliar.put(columnasRepresentante.get(1),data.getString(columnasRepresentante.get(1)));
                 auxiliar.put(columnasRepresentante.get(2),data.getString(columnasRepresentante.get(2)));
-                auxiliar.put(columnasRepresentante.get(3),data.getString(columnasRepresentante.get(3)));
-                auxiliar.put(columnasRepresentante.get(4),LocalDate.parse(data.getString(columnasRepresentante.get(4))));
+                auxiliar.put(columnasRepresentante.get(3),LocalDate.parse(data.getString(columnasRepresentante.get(3))));
                 String selectProhibidos = "select Equipo_idEquipo from Representante_has_Equipo where Representante_DNI = \"" + data.getString("dniRepresentante") +"\" and Representante_habilitado = false;";
                 ResultSet datosProhidos;
                 PreparedStatement sentenciaProhibida = conexion.prepareStatement(selectProhibidos);
                 datosProhidos = sentenciaProhibida.executeQuery(selectProhibidos);
                 HashSet<Integer> equiposProhibidos = new HashSet<>();
                 while (datosProhidos.next() == true) {
-                    equiposProhibidos.add(datosProhidos.getInt(columnasRepresentante_has_Equipo.get(2)));
+                    equiposProhibidos.add(datosProhidos.getInt(columnasRepresentante_has_Equipo.get(1)));
                 }
                 auxiliar.put("EquiposProhibido", equiposProhibidos);
                 /*
@@ -312,7 +312,7 @@ public class AccesoBaseDeDatos {
                 datosContactados = sentenciaContactados.executeQuery(selectContactados);
                 HashSet<Integer> equiposContactados = new HashSet<>();
                 while (datosContactados.next() == true) {
-                    equiposContactados.add(datosContactados.getInt(columnasRepresentante_has_Equipo.get(2)));
+                    equiposContactados.add(datosContactados.getInt(columnasRepresentante_has_Equipo.get(1)));
                 }
                 auxiliar.put("EquiposContactados", equiposContactados);
                 /*
@@ -332,15 +332,15 @@ public class AccesoBaseDeDatos {
                 HashMap<Integer,HashMap<String,Object>> jugadores=new HashMap<>();
                 HashMap<String,Object>aux2=new HashMap<>();
                 while (datosRepresentados.next() == true) {
+                    aux2.put(columnasJugador.get(1),datosRepresentados.getString(columnasJugador.get(1)));
                     aux2.put(columnasJugador.get(2),datosRepresentados.getString(columnasJugador.get(2)));
-                    aux2.put(columnasJugador.get(3),datosRepresentados.getString(columnasJugador.get(3)));
-                    aux2.put(columnasJugador.get(4),LocalDate.parse(datosRepresentados.getString(columnasJugador.get(4))));
-                    aux2.put(columnasJugador.get(5),datosRepresentados.getFloat(columnasJugador.get(5)));
-                    aux2.put(columnasPosicion.get(2),Posicion.valueOf(datosRepresentados.getString("upper("+columnasPosicion.get(2)+")")));
-                    jugadores.put(datosRepresentados.getInt("DNI"),aux2);
+                    aux2.put(columnasJugador.get(3),LocalDate.parse(datosRepresentados.getString(columnasJugador.get(3))));
+                    aux2.put(columnasJugador.get(4),datosRepresentados.getFloat(columnasJugador.get(4)));
+                    aux2.put(columnasPosicion.get(1),Posicion.valueOf(datosRepresentados.getString("upper("+columnasPosicion.get(1)+")")));
+                    jugadores.put(datosRepresentados.getInt(columnasJugador.get(0)),aux2);
                 }
                 auxiliar.put("Jugadores",jugadores);
-                datitos.put(data.getInt(columnasRepresentante.get(1)), auxiliar);
+                datitos.put(data.getInt(columnasRepresentante.get(0)), auxiliar);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -404,7 +404,7 @@ public class AccesoBaseDeDatos {
                 jugador.put("apellidoJugador",data.getString("apellidoJugador"));
                 jugador.put("fechaNacimiento",LocalDate.parse(data.getString("fechaNacimiento")));
                 jugador.put("salario",data.getFloat("salario"));
-                jugador.put("posicion",Posicion.valueOf(data.getString("upper(rol)")));
+                jugador.put("rol",Posicion.valueOf(data.getString("upper(rol)")));
                 auxiliar.put("Jugador",jugador);
                 auxiliar.put("Equipo_id",data.getInt("Equipo_id"));
                 auxiliar.put("completado", data.getBoolean("completado"));
