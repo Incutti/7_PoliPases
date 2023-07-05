@@ -354,6 +354,7 @@ public class AccesoBaseDeDatos {
                 while (posiciones.next() == true) {
                     cantPermitidaPosicio.put(Posicion.valueOf(posiciones.getString("upper(rol)")), posiciones.getInt("cantidadPermitida"));
                 }
+
                 auxiliar.put("cantPermitidaPosicion",cantPermitidaPosicio);
 //                equipoNuevo.setCantPermitidaPosicion(cantPermitidaPosicio);
                 auxiliar.put("dorsales",new HashMap<>());
@@ -371,25 +372,31 @@ public class AccesoBaseDeDatos {
     public void llenarDorsales(){
 
         // hay que completar fichajes :/
-        for(Fichaje f : historiaFichaje){
-            HashMap<Integer, Jugador>dorsales =f.getClub().getDorsales();
-            dorsales.put(f.getNumeroCamiseta(), f.getJugador());
-            f.getClub().setDorsales(dorsales);
+        HashMap<Integer,HashMap<String,Object>> historiaFichaje=traerFichajes();
+        for(Map.Entry<Integer, HashMap<String, Object>> lista : historiaFichaje.entrySet()){
+            lista.getValue().get("numCamiseta");//esto devuelve el numero de camiseta
+            // despues hay que traducir todo a clases de java
+            
+//            HashMap<Integer, Jugador> dorsales =lista.getValue().gegetClub().getDorsales();
+//            dorsales.put(f.getNumeroCamiseta(), f.getJugador());
+//            f.getClub().setDorsales(dorsales);
+
         }
     }
 
 
     public HashMap<Integer,HashMap<String,Object>> traerFichajes(){
+
         HashMap<Integer,HashMap<String,Object>> datitos=new HashMap<>();
         String consulta = "select nombreJugador,apellidoJugador,fechaNacimiento,salario,upper(rol),Representante_DNI,Posicion_idPosicion,idFichaje,numCamiseta,fechaHoraFichaje,Equipo_id,Jugador_id,completado from Fichaje join Jugador on Fichaje.Jugador_id = Jugador.DNI join Posicion on Jugador.Posicion_idPosicion=Posicion.id;";
-        Representante managerJugador = new Representante();
+//        Representante managerJugador = new Representante();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         try {
             ResultSet data;
             PreparedStatement sentenciaSQL = conexion.prepareStatement(consulta);
             data = sentenciaSQL.executeQuery(consulta);
             while (data.next()) {
-                Fichaje fichajeNuevo =new Fichaje();
+//                Fichaje fichajeNuevo =new Fichaje();
                 HashMap<String,Object> auxiliar=new HashMap<>();
                 auxiliar.put("numCamiseta",data.getInt("numCamiseta"));
                 auxiliar.put("fechaHoraFichaje",data.getString("fechaHoraFichaje"));
@@ -398,18 +405,26 @@ public class AccesoBaseDeDatos {
                 //Hay que traer primero los Representantes
 
                 HashMap<Integer,HashMap<String,Object>> listaManager=traerRepresentante();
-                for(Map.Entry<Integer, HashMap<String, Object>> lista : listaManager.entrySet())
+//              fichajeNuevo.setJugador(new Jugador(data.getInt("Jugador_id"),data.getString("nombreJugador"),data.getString("apellidoJugador"), LocalDate.parse(data.getString("fechaNacimiento")),data.getFloat("salario"),managerJugador,Posicion.valueOf(data.getString("upper(rol)"))));
+                HashMap<Integer,HashMap<String,Object>>jugador=new HashMap<>();
+                HashMap<String,Object>aux2=new HashMap<>();
+                    aux2.put("nombreJugador",data.getString("nombreJugador"));
+                    aux2.put("apellidoJugador",data.getString("apellidoJugador"));
+                    aux2.put("fechaNacimiento",LocalDate.parse(data.getString("fechaNacimiento")));
+                    aux2.put("salario",data.getFloat("salario"));
+                    aux2.put("posicion",Posicion.valueOf(data.getString("upper(rol)")));
+                for(Map.Entry<Integer, HashMap<String, Object>> lista : listaManager.entrySet()){
                     if(lista.getKey() == data.getInt("Representante_DNI")){
-
+                        aux2.put("Representante",lista);
                     }
                 }
-                fichajeNuevo.setJugador(new Jugador(data.getInt("Jugador_id"),data.getString("nombreJugador"),data.getString("apellidoJugador"), LocalDate.parse(data.getString("fechaNacimiento")),data.getFloat("salario"),managerJugador,Posicion.valueOf(data.getString("upper(rol)"))));
-
+                    jugador.put(data.getInt("Jugador_id"),aux2);
+                auxiliar.put("Jugador",jugador);
                 HashMap<Integer,HashMap<String,Object>> listaEquipos=traerEquipos();
 
-                for(Map.Entry<Integer, HashMap<String,Object>> id: listaEquipos.entrySet()) {
-                    if (data.getInt("Equipo_id") == id.getKey()) {
-                        auxiliar.put("Equipo",id);
+                for(Map.Entry<Integer, HashMap<String,Object>> lista: listaEquipos.entrySet()) {
+                    if (data.getInt("Equipo_id") == lista.getKey()) {
+                        auxiliar.put("Equipo",lista);
                     }
                 }
 //                    for (Map.Entry<String,Object> valores: id.getValue().entrySet()){

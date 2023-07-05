@@ -55,6 +55,9 @@ public class Sistema {
         this.accesoBase = accesoBase;
     }
 
+    public List<String> getTablas() {return tablas;}
+
+    public void setTablas(List<String> tablas) {this.tablas = tablas;}
 
     public void traerFichajes(){
         String consulta = "select nombreJugador,apellidoJugador,fechaNacimiento,salario,upper(rol),Representante_DNI,Posicion_idPosicion,idFichaje,numCamiseta,fechaHoraFichaje,Equipo_id,Jugador_id,completado from Fichaje join Jugador on Fichaje.Jugador_id = Jugador.DNI join Posicion on Jugador.Posicion_idPosicion=Posicion.id;";
@@ -461,10 +464,10 @@ public class Sistema {
 
     public static void main(String[] args) {
         Sistema s1= new Sistema();
-        s1.tablas = Arrays.asList("Jugador", "Posicion", "Fichaje", "Equipo", "Representante", "Representante_has_Equipo", "Equipo_has_Posicion");
-        s1.accesoBase = new AccesoBaseDeDatos("PoliPases", s1.tablas);
+        s1.setTablas(Arrays.asList("Jugador", "Posicion", "Fichaje", "Equipo", "Representante", "Representante_has_Equipo", "Equipo_has_Posicion"));
+        s1.setAccesoBase( new AccesoBaseDeDatos("PoliPases", s1.tablas));
         try {
-            s1.accesoBase.conectar("alumno", "alumnoipm");
+            s1.getAccesoBase().conectar("alumno", "alumnoipm");
             s1.traerEquipos();//Primero Clubes
             s1.traerRepresentante();//Despues Representantes
             s1.traerFichajes();//Despues Fichajes
