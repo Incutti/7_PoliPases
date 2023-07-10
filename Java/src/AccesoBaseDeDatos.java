@@ -415,5 +415,114 @@ public class AccesoBaseDeDatos {
         }
         return datitos;
     }
+    public ArrayList<String> jugadoresPorClubPorPosicion() {
+        String consulta = "SELECT *,upper(rol) FROM jugadoresPorClub;";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = conexion.prepareStatement(consulta);
+            data = sentenciaSQL.
+                    executeQuery(consulta);
+            while (data.next()) {
+                nombreCampos.add(data.getString("upper(rol)"));
+                nombreCampos.add(data.getString("nombreJugador"));
+                nombreCampos.add(data.getString("apellidoJugador"));
+                nombreCampos.add(data.getString("nombreEquipo"));
+                nombreCampos.add("\n");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return nombreCampos;
+    }
+    public ArrayList<String> fichajeCaidoPorPosicion(){
+        String consulta = "SELECT idFichaje, Equipo_id, Jugador_id FROM Fichaje WHERE !verificarPosicion(idFichaje);";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = conexion.prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
 
+            while (data.next()) {
+                nombreCampos.add(data.getString("idFichaje"));
+                nombreCampos.add(data.getString("Equipo_id"));
+                nombreCampos.add(data.getString("Jugador_id"));
+
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return nombreCampos;
+    }
+    public ArrayList<String> jugadorMalRepresentado(){
+        String consulta = "SELECT distinct nombreJugador, apellidoJugador FROM Jugador JOIN Fichaje ON DNI=Jugador_id WHERE !verificarManager(idFichaje);";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = conexion.prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+
+            while (data.next()) {
+                nombreCampos.add(data.getString("nombreJugador"));
+                nombreCampos.add(data.getString("apellidoJugador"));
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return nombreCampos;
+    }
+
+    public ArrayList<String> clubProhibidoMasRecurrente(){
+        String consulta = "select max(cantidad), Equipo_idEquipo from (select Equipo_idEquipo, count(*) as cantidad from Representante_has_Equipo where Representante_habilitado=0 group by Equipo_idEquipo) as cualquiercosa group by Equipo_idEquipo limit 1;";
+        ArrayList<String> nombreCampos = new ArrayList<>();
+        try {
+            ResultSet data;
+            PreparedStatement sentenciaSQL = conexion.prepareStatement(consulta);
+            data = sentenciaSQL.executeQuery(consulta);
+
+            while (data.next()) {
+                nombreCampos.add("CANTIDAD DE RECURRENCIAS:");
+                nombreCampos.add(data.getString("max(cantidad)"));
+                nombreCampos.add("ID EQUIPO:");
+                nombreCampos.add(data.getString("Equipo_idEquipo"));
+                nombreCampos.add("\n");
+
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return nombreCampos;
+    }
+
+    public void verificarFichaje(int fichajeID){
+        String consulta="{call verificarFichaje(?,?,?)};";
+        try{
+            CallableStatement sentenciaSQL = conexion.prepareCall(consulta);
+            sentenciaSQL.setInt(1,fichajeID);
+            sentenciaSQL.registerOutParameter(2, Types.NVARCHAR);
+            sentenciaSQL.registerOutParameter(3, Types.NVARCHAR);
+
+            sentenciaSQL.execute();
+            //
+            // Process all returned result sets
+            //
+            String error = sentenciaSQL.getString(2);
+            if (!error.equals("")) {
+                System.out.println("Id: " + fichajeID);
+                System.out.println("Error: " + error);
+            }
+            String correccion = sentenciaSQL.getString(3);
+            if(!correccion.equals("")){
+                System.out.println("Correcciones: " + correccion);
+            }
+
+        }
+        catch(SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
 }
