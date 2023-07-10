@@ -1,14 +1,15 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Fichaje {
     private int idFichaje;
     private int numeroCamiseta;
-    private LocalDateTime fechaHoraFichaje;
+    private LocalDate fechaHoraFichaje;
     private Jugador jugador;
     private Equipo club;
     private boolean completado;
 
-    public Fichaje(int idFichaje,int numeroCamiseta, LocalDateTime fechaHoraFichaje, Jugador jugador, Equipo club, boolean completado) {
+    public Fichaje(int idFichaje, int numeroCamiseta, LocalDate fechaHoraFichaje, Jugador jugador, Equipo club, boolean completado) {
         this.idFichaje=idFichaje;
         this.numeroCamiseta = numeroCamiseta;
         this.fechaHoraFichaje = fechaHoraFichaje;
@@ -20,7 +21,7 @@ public class Fichaje {
     public Fichaje(){
         idFichaje=21311;
         numeroCamiseta= 3;
-        fechaHoraFichaje=LocalDateTime.now();
+        fechaHoraFichaje=LocalDate.now();
         jugador=new Jugador();
         club=new Equipo();
         completado=false;
@@ -42,11 +43,11 @@ public class Fichaje {
         this.numeroCamiseta = numeroCamiseta;
     }
 
-    public LocalDateTime getFechaHoraFichaje() {
+    public LocalDate getFechaHoraFichaje() {
         return fechaHoraFichaje;
     }
 
-    public void setFechaHoraFichaje(LocalDateTime fechaHoraFichaje) {
+    public void setFechaHoraFichaje(LocalDate fechaHoraFichaje) {
         this.fechaHoraFichaje = fechaHoraFichaje;
     }
 
