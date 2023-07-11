@@ -92,14 +92,14 @@ public class Sistema {
 //        }
 //    }
     public void traerFichajes2(HashMap<Integer,HashMap<String, Object>>datos){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MMM-dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         ArrayList<String>columnas = accesoBase.obtenerColumnasDeUnaTabla("Fichaje");
         ArrayList<String>columnasJugador = accesoBase.obtenerColumnasDeUnaTabla("Jugador");
         ArrayList<String>columnasPosicion = accesoBase.obtenerColumnasDeUnaTabla("Posicion");
-        Representante managerJugador = new Representante();
-        Jugador jugador = new Jugador();
         for(Map.Entry<Integer,HashMap<String, Object>>d : datos.entrySet()){
             Fichaje fichaje = new Fichaje();
+            Jugador jugador = new Jugador();
+            Representante managerJugador = new Representante();
             fichaje.setIdFichaje(d.getKey());
             for(Map.Entry<String, Object>entry : d.getValue().entrySet()){
                 if (entry.getKey().equals(columnas.get(1))){
@@ -110,14 +110,12 @@ public class Sistema {
                     LocalDate l = LocalDate.parse((String) entry.getValue(),formatter); //error con el LocalDate ()
                     fichaje.setFechaHoraFichaje(l);
                 }
-
                 if (entry.getKey().equals(columnas.get(3))){
                     for (Equipo e : listaEquipos){
                         if (e.getId() == (Integer) entry.getValue()){
                             fichaje.setClub(e);
                         }
                     }
-
                 }
                 if (entry.getKey().equals("Jugador")) {
                     for(Map.Entry<String,Object>e : ((HashMap<String, Object>)entry.getValue()).entrySet()) {
@@ -418,44 +416,23 @@ public class Sistema {
     public void correccionFichaje2(){
         System.out.println("EJERCICIO H");
         System.out.println("Debido  a  una  penalidad  que  pone  la  asociación  a  los  clubes  que tienen más de 3 fichajes rechazados "+'\n'+"(esto nos está sucediendo con 2  clubes)  se  pide modificar  los  fichajes  necesarios  para  que  se consideren aceptados los clubes y así eviten la sanción.");
-        HashMap <Equipo, Integer> fichajesCaidosPorEquipo=new HashMap<>();
+        HashMap <Equipo, HashSet<Fichaje>> fichajesCaidosPorEquipo=new HashMap<>();
         for(Fichaje fichaje:historiaFichaje){
             if(!fichaje.isCompletado()){
-                fichajesCaidosPorEquipo.put(fichaje.getClub(),(fichajesCaidosPorEquipo.get(fichaje.getClub()) == null )? 1:fichajesCaidosPorEquipo.get(fichaje.getClub()) +1);
+                if(fichajesCaidosPorEquipo.containsKey(fichaje.getClub())){
+                    fichajesCaidosPorEquipo.get(fichaje.getClub()).add(fichaje);
+                }else {
+                    HashSet<Fichaje>fs = new HashSet<>();
+                    fs.add(fichaje);
+                    fichajesCaidosPorEquipo.put(fichaje.getClub(), fs);
+                }
             }
         }
-        for(Map.Entry<Equipo, Integer> equipo:fichajesCaidosPorEquipo.entrySet()){
-            if(equipo.getValue()>3){
-                for(Fichaje fichaje:historiaFichaje){
+        for(Map.Entry<Equipo, HashSet<Fichaje>> equipo:fichajesCaidosPorEquipo.entrySet()){
+            if(equipo.getValue().size()>3){
+                for(Fichaje fichaje:equipo.getValue()){
                     if(fichaje.getClub().equals(equipo.getKey()) && !fichaje.isCompletado()){
                         this.getAccesoBase().verificarFichaje(fichaje.getIdFichaje());
-                        // lo de abajo se puede borrar si funciona bien sin esto
-//                        String consulta="{call verificarFichaje(?,?,?)};";
-//                        try{
-//                            CallableStatement sentenciaSQL = accesoBase.getConexion().prepareCall(consulta);
-//                            sentenciaSQL.setInt(1,fichaje.getIdFichaje());
-//                            sentenciaSQL.registerOutParameter(2, Types.NVARCHAR);
-//                            sentenciaSQL.registerOutParameter(3, Types.NVARCHAR);
-//
-//                            sentenciaSQL.execute();
-//                            //
-//                            // Process all returned result sets
-//                            //
-//                            String error = sentenciaSQL.getString(2);
-//                            if (!error.equals("")) {
-//                                System.out.println("Id: " + fichaje.getIdFichaje());
-//                                System.out.println("Error: " + error);
-//                            }
-//                            String correccion = sentenciaSQL.getString(3);
-//                            if(!correccion.equals("")){
-//                                System.out.println("Correcciones: " + correccion);
-//                            }
-//
-//                        }
-//                        catch(SQLException ex) {
-//                            ex.printStackTrace();
-//                        }
-
                     }
                 }
             }
