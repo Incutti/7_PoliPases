@@ -59,8 +59,8 @@ DETERMINISTIC
 begin
 	DECLARE cant INT default 0;
     select count(Jugador.DNI) into cant from Jugador 
-    left join Posicion on Jugador.Posicion_idPosicion = Posicion.id 
-	left join Equipo_has_Posicion on Posicion.id = Equipo_has_Posicion.idPosicion
+    join Posicion on Jugador.Posicion_idPosicion = Posicion.id 
+	join Equipo_has_Posicion on Posicion.id = Equipo_has_Posicion.idPosicion
     where Jugador.Posicion_idPosicion = posicionP and Equipo_has_Posicion.Equipo_id = idclub;
     return cant;
 end//
@@ -76,8 +76,8 @@ DETERMINISTIC
 begin
 	DECLARE cant INT default 0;
     select count(Jugador.DNI) into cant from Jugador
-    left join Representante on Jugador.Representante_DNI = Representante.dniRepresentante 
-	left join Representante_has_Equipo on Representante.dniRepresentante = Representante_has_Equipo.Representante_DNI
+    join Representante on Jugador.Representante_DNI = Representante.dniRepresentante 
+	join Representante_has_Equipo on Representante.dniRepresentante = Representante_has_Equipo.Representante_DNI
     where Representante.dniRepresentante = idManager and Representante_has_Equipo.Equipo_idEquipo = club;
     return cant;
 end//
@@ -124,9 +124,9 @@ deterministic
 begin
 	declare club varchar(100);
 	select Equipo.nombreEquipo into club from Equipo
-    inner join Equipo_has_Posicion on Equipo_has_Posicion.Equipo_id=Equipo.idEquipo 
-    inner join Posicion on Equipo_has_Posicion.idPosicion=Posicion.id
-    inner join Jugador on Posicion.id = Jugador.Posicion_idPosicion
+    join Equipo_has_Posicion on Equipo_has_Posicion.Equipo_id=Equipo.idEquipo 
+    join Posicion on Equipo_has_Posicion.idPosicion=Posicion.id
+    join Jugador on Posicion.id = Jugador.Posicion_idPosicion
     where Jugador.Posicion_idPosicion=posicionId  group by Equipo.nombreEquipo 
     order by count(Jugador.DNI) desc limit 1; 
 	return club;
