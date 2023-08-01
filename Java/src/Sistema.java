@@ -59,38 +59,6 @@ public class Sistema {
     }
 
 
-//      public void traerFichajes(){
-//        String consulta = "select nombreJugador,apellidoJugador,fechaNacimiento,salario,upper(rol),Representante_DNI,Posicion_idPosicion,idFichaje,numCamiseta,fechaHoraFichaje,Equipo_id,Jugador_id,completado from Fichaje join Jugador on Fichaje.Jugador_id = Jugador.DNI join Posicion on Jugador.Posicion_idPosicion=Posicion.id;";
-//        Representante managerJugador = new Representante();
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        try {
-//            ResultSet data;
-//            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
-//            data = sentenciaSQL.executeQuery(consulta);
-//            while (data.next()) {
-//                Fichaje fichajeNuevo =new Fichaje();
-//                fichajeNuevo.setIdFichaje(data.getInt("idFichaje"));
-//                fichajeNuevo.setNumeroCamiseta(data.getInt("numCamiseta"));
-//                fichajeNuevo.setFechaHoraFichaje(LocalDateTime.parse(data.getString("fechaHoraFichaje"),formatter));
-//                //Hay que traer primero los Representantes
-//                for(Representante r : listaManager){
-//                    if(r.getDni() == data.getInt("Representante_DNI")){
-//                        managerJugador = r;
-//                    }
-//                }
-//                fichajeNuevo.setJugador(new Jugador(data.getInt("Jugador_id"),data.getString("nombreJugador"),data.getString("apellidoJugador"),LocalDate.parse(data.getString("fechaNacimiento")),data.getFloat("salario"),managerJugador,Posicion.valueOf(data.getString("upper(rol)"))));
-//                for(Equipo e: listaEquipos){
-//                    if(data.getInt("Equipo_id") == e.getId()) {
-//                        fichajeNuevo.setClub(e);
-//                    }
-//                }
-//                fichajeNuevo.setCompletado(data.getBoolean("completado"));
-//                historiaFichaje.add(fichajeNuevo);
-//            }
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
-//    }
     public void traerFichajes2(HashMap<Integer,HashMap<String, Object>>datos){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         ArrayList<String>columnas = accesoBase.obtenerColumnasDeUnaTabla("Fichaje");
@@ -161,33 +129,6 @@ public class Sistema {
         llenarDorsales();
     }
 
-    public void traerEquipos(){
-        String consulta = "SELECT idEquipo,nombreEquipo FROM Equipo;";
-        try {
-            ResultSet data;
-            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
-            data = sentenciaSQL.executeQuery(consulta);
-            while (data.next()) {
-                String selectPosiciones = "SELECT upper(rol),cantidadPermitida FROM Equipo JOIN Equipo_has_Posicion ON idEquipo = Equipo_has_Posicion.Equipo_id JOIN Posicion ON idPosicion=id JOIN Fichaje ON Fichaje.Equipo_id=idEquipo where idEquipo = "+data.getInt("idEquipo")+";";
-                ResultSet posiciones;
-                PreparedStatement sentencia = accesoBase.getConexion().prepareStatement(selectPosiciones);
-                posiciones = sentencia.executeQuery(selectPosiciones);
-                Equipo equipoNuevo =new Equipo();
-                HashMap<Posicion,Integer> cantPermitidaPosicio=new HashMap<>();
-                equipoNuevo.setId(data.getInt("idEquipo"));
-                equipoNuevo.setNombre(data.getString("nombreEquipo"));
-                while (posiciones.next() == true) {
-                    cantPermitidaPosicio.put(Posicion.valueOf(posiciones.getString("upper(rol)")), posiciones.getInt("cantidadPermitida"));
-                }
-                equipoNuevo.setCantPermitidaPosicion(cantPermitidaPosicio);
-                equipoNuevo.setDorsales(new HashMap<>());
-                // falta dorsales
-                listaEquipos.add(equipoNuevo);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
 
     public void traduccionEquipo(HashMap<Integer,HashMap<String,Object>>datos){
         ArrayList<String>columnas = accesoBase.obtenerColumnasDeUnaTabla("Equipo");
@@ -218,60 +159,6 @@ public class Sistema {
         }
     }
 
-//    public void traerRepresentante(){
-//        String consulta = "SELECT dniRepresentante,nombreRepresentante,apellidoRepresentante,Representante.fechaNacimiento,nombreEquipo,representante_habilitado from Representante join Representante_has_Equipo ON dniRepresentante=Representante_DNI join Equipo ON Equipo_idEquipo=idEquipo;";
-//        try {
-//            ResultSet data;
-//            PreparedStatement sentenciaSQL = accesoBase.getConexion().prepareStatement(consulta);
-//            data = sentenciaSQL.executeQuery(consulta);
-//            while (data.next()) {
-//                Representante representante=new Representante();
-//                representante.setDni(data.getInt("dniRepresentante"));
-//                representante.setNombre(data.getString("nombreRepresentante"));
-//                representante.setApellido(data.getString("apellidoRepresentante"));
-//                representante.setFechaNacimiento(LocalDate.parse(data.getString("fechaNacimiento")));
-//                //Primero traer Clubes
-//                String selectProhibidos = "select Equipo_idEquipo from Representante_has_Equipo where Representante_DNI = \"" + data.getString("dniRepresentante") +"\" and Representante_habilitado = false;";
-//                ResultSet datosProhidos;
-//                PreparedStatement sentenciaProhibida = accesoBase.getConexion().prepareStatement(selectProhibidos);
-//                datosProhidos = sentenciaProhibida.executeQuery(selectProhibidos);
-//                HashSet<Equipo>clubesProhibidos = new HashSet<>();
-//                while (datosProhidos.next() == true) {
-//                    for (Equipo e : listaEquipos) {
-//                        if(e.getId() == datosProhidos.getInt("Equipo_idEquipo")){
-//                            clubesProhibidos.add(e);
-//                        }
-//                    }
-//                }
-//                representante.setClubesProhibidos(clubesProhibidos);
-//                String selectContactados = "select Equipo_idEquipo from Representante_has_Equipo where Representante_DNI = \"" + data.getString("dniRepresentante") +"\" and Representante_habilitado = true;";
-//                ResultSet datosContactados;
-//                PreparedStatement sentenciaContactados = accesoBase.getConexion().prepareStatement(selectContactados);
-//                datosContactados = sentenciaContactados.executeQuery(selectContactados);
-//                HashSet<Equipo>clubesContactados = new HashSet<>();
-//                while (datosContactados.next() == true) {
-//                    for (Equipo e : listaEquipos) {
-//                        if(e.getId() == datosContactados.getInt("Equipo_idEquipo")){
-//                            clubesContactados.add(e);
-//                        }
-//                    }
-//                }
-//                representante.setClubesContactados(clubesContactados);
-//                String consulta1 = "select DNI,nombreJugador,apellidoJugador,fechaNacimiento,salario,upper(rol) from Jugador join Posicion on Jugador.Posicion_idPosicion = Posicion.id where Representante_DNI = "+data.getInt("dniRepresentante")+";";
-//                ResultSet datosRepresentados;
-//                PreparedStatement sentenciaRepresentados = accesoBase.getConexion().prepareStatement(consulta1);
-//                datosRepresentados = sentenciaRepresentados.executeQuery(consulta1);
-//                HashSet<Jugador>representados = new HashSet<>();
-//                while (datosRepresentados.next() == true) {
-//                    representados.add(new Jugador(datosRepresentados.getInt("DNI"), datosRepresentados.getString("nombreJugador"), datosRepresentados.getString("apellidoJugador"), LocalDate.parse(datosRepresentados.getString("fechaNacimiento")), datosRepresentados.getFloat("salario"), Posicion.valueOf(datosRepresentados.getString("upper(rol)"))));
-//                }
-//                representante.setJugadoresRepresentados(representados);
-//                listaManager.add(representante);
-//            }
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        }
-//    }
 
     public void traduccionRepresentante(HashMap<Integer,HashMap<String,Object>>datos){
         ArrayList<String>columnas = accesoBase.obtenerColumnasDeUnaTabla("Representante");
