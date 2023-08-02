@@ -421,7 +421,7 @@ public class Sistema {
             s1.listaEquipos = new HashSet<>();
             s1.listaManager = new HashSet<>();
 
-            s1.traerEquipos();
+            s1.getAccesoBase().traerEquipos();
 //            s1.traerFichajes();
             s1.llenarDorsales();
 
